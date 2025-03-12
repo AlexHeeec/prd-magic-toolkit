@@ -6,6 +6,7 @@ import RightPanel from "./RightPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import ErrorBoundary from "./ErrorBoundary";
 
 const Workspace: React.FC = () => {
   const isMobile = useIsMobile();
@@ -27,7 +28,9 @@ const Workspace: React.FC = () => {
         <>
           {activePanel === 'left' && (
             <div className="animate-slide-in-left absolute inset-0 z-10 bg-background">
-              <LeftPanel onGenerate={handleGenerate} />
+              <ErrorBoundary>
+                <LeftPanel onGenerate={handleGenerate} />
+              </ErrorBoundary>
               <Button
                 variant="outline"
                 size="icon"
@@ -41,7 +44,9 @@ const Workspace: React.FC = () => {
           
           {activePanel === 'center' && (
             <div className="w-full animate-fade-in">
-              <CenterPanel isGenerating={isGenerating} />
+              <ErrorBoundary>
+                <CenterPanel isGenerating={isGenerating} />
+              </ErrorBoundary>
               <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                 <Button
                   variant="outline"
@@ -65,7 +70,9 @@ const Workspace: React.FC = () => {
           
           {activePanel === 'right' && (
             <div className="animate-slide-in-right absolute inset-0 z-10 bg-background">
-              <RightPanel />
+              <ErrorBoundary>
+                <RightPanel />
+              </ErrorBoundary>
               <Button
                 variant="outline"
                 size="icon"
@@ -84,12 +91,18 @@ const Workspace: React.FC = () => {
               leftVisible ? 'w-1/3 opacity-100' : 'w-0 opacity-0'
             }`}
           >
-            {leftVisible && <LeftPanel onGenerate={handleGenerate} />}
+            {leftVisible && (
+              <ErrorBoundary>
+                <LeftPanel onGenerate={handleGenerate} />
+              </ErrorBoundary>
+            )}
           </div>
           
           <div className={`panel-transition flex-1 flex ${!leftVisible && !rightVisible ? 'mx-auto max-w-4xl' : ''}`}>
             <div className="relative w-full">
-              <CenterPanel isGenerating={isGenerating} />
+              <ErrorBoundary>
+                <CenterPanel isGenerating={isGenerating} />
+              </ErrorBoundary>
               
               {!leftVisible && (
                 <Button
@@ -120,7 +133,11 @@ const Workspace: React.FC = () => {
               rightVisible ? 'w-1/3 opacity-100' : 'w-0 opacity-0'
             }`}
           >
-            {rightVisible && <RightPanel />}
+            {rightVisible && (
+              <ErrorBoundary>
+                <RightPanel />
+              </ErrorBoundary>
+            )}
           </div>
         </>
       )}
