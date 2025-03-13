@@ -7,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, History, Send, Bot, User, Trash, RotateCcw } from "lucide-react";
+import { MessageCircle, History, Send, Bot, User, Trash, RotateCcw, Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Message {
   id: string;
@@ -65,12 +66,30 @@ const mockVersions: Version[] = [
   }
 ];
 
+// Sample AI responses based on user input
+const getAIResponse = (userInput: string): string => {
+  const input = userInput.toLowerCase();
+  
+  if (input.includes("add") && (input.includes("test") || input.includes("case"))) {
+    return "I've added new test cases based on your request. You can see them in the test case panel.";
+  } else if (input.includes("delete") || input.includes("remove")) {
+    return "I've removed the specified test cases from the list. Is there anything else you'd like me to modify?";
+  } else if (input.includes("modify") || input.includes("update") || input.includes("change")) {
+    return "I've updated the test cases according to your specifications. The changes are now reflected in the test case panel.";
+  } else if (input.includes("priority")) {
+    return "I've adjusted the priority levels for the test cases you mentioned. You can filter by priority to see the changes.";
+  } else {
+    return "I understand your request. I'll analyze and process it to modify the test cases accordingly. Is there anything specific you'd like me to focus on?";
+  }
+};
+
 const RightPanel: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [versions, setVersions] = useState<Version[]>(mockVersions);
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -94,17 +113,37 @@ const RightPanel: React.FC = () => {
     setNewMessage("");
     setIsTyping(true);
     
-    // Simulate AI response
+    // Simulate AI processing and response
     setTimeout(() => {
+      const aiResponse = getAIResponse(userMessage.content);
+      
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "I'm analyzing your request. I'll update the test cases accordingly.",
+        content: aiResponse,
         sender: "ai",
         timestamp: new Date(),
       };
       
       setMessages((prev) => [...prev, aiMessage]);
       setIsTyping(false);
+      
+      // Add a new version if the message suggests modifications were made
+      if (userMessage.content.toLowerCase().match(/add|delete|remove|modify|update|change|priority/)) {
+        const newVersion: Version = {
+          id: (Date.now() + 2).toString(),
+          name: `Updated based on user feedback`,
+          timestamp: new Date(),
+          changes: `Modified test cases based on: "${userMessage.content.substring(0, 40)}${userMessage.content.length > 40 ? '...' : ''}"`
+        };
+        
+        setVersions((prev) => [...prev, newVersion]);
+        
+        toast({
+          title: "Test cases updated",
+          description: "Changes have been applied based on your request",
+          duration: 3000,
+        });
+      }
     }, 1500);
   };
 
@@ -121,6 +160,14 @@ const RightPanel: React.FC = () => {
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  };
+
+  const handleRestoreVersion = (version: Version) => {
+    toast({
+      title: `Restored to "${version.name}"`,
+      description: "The test cases have been reverted to this version",
+      duration: 3000,
+    });
   };
 
   return (
@@ -218,9 +265,13 @@ const RightPanel: React.FC = () => {
               size="icon"
               className="absolute right-2 bottom-2"
               onClick={handleSendMessage}
-              disabled={newMessage.trim() === ""}
+              disabled={newMessage.trim() === "" || isTyping}
             >
-              <Send className="h-4 w-4" />
+              {isTyping ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
               <span className="sr-only">Send</span>
             </Button>
           </div>
@@ -244,7 +295,12 @@ const RightPanel: React.FC = () => {
                       {index === versions.length - 1 && (
                         <Badge variant="outline" className="text-xs bg-primary/10 border-primary/20">Current</Badge>
                       )}
-                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7"
+                        onClick={() => handleRestoreVersion(version)}
+                      >
                         <RotateCcw className="h-3.5 w-3.5" />
                         <span className="sr-only">Restore</span>
                       </Button>
