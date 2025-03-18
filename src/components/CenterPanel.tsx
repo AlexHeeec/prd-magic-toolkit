@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import TestCase, { TestCaseProps } from "./TestCase";
 import { Button } from "@/components/ui/button";
@@ -103,15 +104,30 @@ const mockTestCases: TestCaseProps[] = [
   }
 ];
 
+// Mapping history items to test case sets (in a real app, this would come from the backend)
+const historyTestCaseMapping: { [key: string]: TestCaseProps[] } = {
+  "1": mockTestCases.filter(tc => tc.scenario === "Authentication" || tc.scenario === "Registration").slice(0, 4),
+  "2": mockTestCases.filter(tc => tc.priority === "high" || tc.priority === "medium").slice(1, 4),
+  "3": mockTestCases.filter(tc => tc.scenario === "Profile Management"),
+  "4": mockTestCases.filter(tc => tc.scenario === "Authentication" && tc.priority === "low")
+};
+
 interface CenterPanelProps {
   isGenerating?: boolean;
   isAiModifying?: boolean;
+  selectedHistoryItem?: string;
+  onHistoryItemChange: (historyId: string) => void;
 }
 
-const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false, isAiModifying = false }) => {
+const CenterPanel: React.FC<CenterPanelProps> = ({ 
+  isGenerating = false, 
+  isAiModifying = false,
+  selectedHistoryItem,
+  onHistoryItemChange
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [scenario, setScenario] = useState<string>("");
-  const [priority, setPriority] = useState<string>("");
+  const [scenario, setScenario] = useState<string>("all");
+  const [priority, setPriority] = useState<string>("all");
   const [testCases, setTestCases] = useState<TestCaseProps[]>([]);
   const [progress, setProgress] = useState(0);
 
@@ -122,7 +138,12 @@ const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false, isAiMod
         setProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
-            setTestCases(mockTestCases);
+            // If a history item is selected, show its test cases
+            if (selectedHistoryItem && historyTestCaseMapping[selectedHistoryItem]) {
+              setTestCases(historyTestCaseMapping[selectedHistoryItem]);
+            } else {
+              setTestCases(mockTestCases);
+            }
             return 100;
           }
           return prev + 5;
@@ -131,19 +152,24 @@ const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false, isAiMod
       
       return () => clearInterval(interval);
     } else {
-      setTestCases(mockTestCases);
+      // If a history item is selected, show its test cases
+      if (selectedHistoryItem && historyTestCaseMapping[selectedHistoryItem]) {
+        setTestCases(historyTestCaseMapping[selectedHistoryItem]);
+      } else {
+        setTestCases(mockTestCases);
+      }
       setProgress(100);
     }
-  }, [isGenerating, isAiModifying]);
+  }, [isGenerating, isAiModifying, selectedHistoryItem]);
 
   const filteredTestCases = testCases.filter((testCase) => {
     const matchesSearch = searchTerm === "" || 
       testCase.title.toLowerCase().includes(searchTerm.toLowerCase());
       
-    const matchesScenario = scenario === "" || 
+    const matchesScenario = scenario === "all" || 
       testCase.scenario === scenario;
       
-    const matchesPriority = priority === "" || 
+    const matchesPriority = priority === "all" || 
       testCase.priority === priority;
       
     return matchesSearch && matchesScenario && matchesPriority;
@@ -252,8 +278,8 @@ const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false, isAiMod
                 className="mt-2"
                 onClick={() => {
                   setSearchTerm("");
-                  setScenario("");
-                  setPriority("");
+                  setScenario("all");
+                  setPriority("all");
                 }}
               >
                 Clear filters

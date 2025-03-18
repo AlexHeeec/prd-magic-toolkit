@@ -22,7 +22,7 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 
-interface HistoryItem {
+export interface HistoryItem {
   id: string;
   title: string;
   date: string;
@@ -45,23 +45,34 @@ const mockHistory: HistoryItem[] = [
   },
   {
     id: "3",
-    title: "Dashboard Analytics",
-    date: "2023-09-05",
-    caseCount: 8
-  },
-  {
-    id: "4",
     title: "Profile Management",
     date: "2023-09-01",
     caseCount: 15
+  },
+  {
+    id: "4",
+    title: "Dashboard Analytics",
+    date: "2023-09-05",
+    caseCount: 8
   }
 ];
 
-const LeftPanel: React.FC<{ onGenerate: () => void }> = ({ onGenerate }) => {
+interface LeftPanelProps {
+  onGenerate: () => void;
+  selectedHistoryItem?: string;
+  onHistoryItemSelect: (historyId: string) => void;
+}
+
+const LeftPanel: React.FC<LeftPanelProps> = ({ 
+  onGenerate, 
+  selectedHistoryItem,
+  onHistoryItemSelect 
+}) => {
   const [prdInput, setPrdInput] = useState("");
   const [prdUrl, setPrdUrl] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [activeTab, setActiveTab] = useState("input");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -78,13 +89,24 @@ const LeftPanel: React.FC<{ onGenerate: () => void }> = ({ onGenerate }) => {
     }, 1500);
   };
 
+  // If a test case is selected but we're not on the history tab, switch to it
+  React.useEffect(() => {
+    if (selectedHistoryItem && activeTab !== "history") {
+      setActiveTab("history");
+    }
+  }, [selectedHistoryItem]);
+
+  const handleHistoryItemClick = (historyId: string) => {
+    onHistoryItemSelect(historyId);
+  };
+
   const hasContent = prdInput.length > 0 || prdUrl.length > 0 || selectedFile !== null;
 
   return (
     <div className="panel-transition w-full h-full p-4 flex flex-col bg-sidebar rounded-xl">
       <h2 className="text-lg font-medium mb-4">Test Case Generation</h2>
       
-      <Tabs defaultValue="input" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-2 mb-4">
           <TabsTrigger value="input" className="flex items-center gap-1">
             <FileText className="h-4 w-4" />
@@ -198,7 +220,13 @@ const LeftPanel: React.FC<{ onGenerate: () => void }> = ({ onGenerate }) => {
           <ScrollArea className="h-[450px] pr-4">
             <div className="space-y-3">
               {mockHistory.map((item) => (
-                <Card key={item.id} className="hover:bg-accent/10 transition-colors cursor-pointer">
+                <Card 
+                  key={item.id} 
+                  className={`hover:bg-accent/10 transition-colors cursor-pointer ${
+                    selectedHistoryItem === item.id ? "bg-accent/20 ring-1 ring-accent" : ""
+                  }`}
+                  onClick={() => handleHistoryItemClick(item.id)}
+                >
                   <CardHeader className="p-4 pb-2">
                     <CardTitle className="text-base truncate">{item.title}</CardTitle>
                     <CardDescription className="text-xs">{item.date}</CardDescription>
