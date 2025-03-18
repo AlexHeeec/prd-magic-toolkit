@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, History, Send, Bot, User, RotateCcw, Loader2 } from "lucide-react";
+import { MessageCircle, History, Send, Bot, User, Trash, RotateCcw, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Message {
@@ -22,10 +22,6 @@ interface Version {
   name: string;
   timestamp: Date;
   changes: string;
-}
-
-interface RightPanelProps {
-  onAiModifying: (isModifying: boolean) => void;
 }
 
 const mockMessages: Message[] = [
@@ -87,7 +83,7 @@ const getAIResponse = (userInput: string): string => {
   }
 };
 
-const RightPanel: React.FC<RightPanelProps> = ({ onAiModifying }) => {
+const RightPanel: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [versions, setVersions] = useState<Version[]>(mockVersions);
   const [newMessage, setNewMessage] = useState("");
@@ -102,11 +98,6 @@ const RightPanel: React.FC<RightPanelProps> = ({ onAiModifying }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-  
-  // When AI is typing, notify parent component
-  useEffect(() => {
-    onAiModifying(isTyping);
-  }, [isTyping, onAiModifying]);
 
   const handleSendMessage = () => {
     if (newMessage.trim() === "") return;
@@ -172,21 +163,11 @@ const RightPanel: React.FC<RightPanelProps> = ({ onAiModifying }) => {
   };
 
   const handleRestoreVersion = (version: Version) => {
-    // Start the loading state
-    setIsTyping(true);
-    onAiModifying(true);
-    
-    // Simulate restoring version
-    setTimeout(() => {
-      setIsTyping(false);
-      onAiModifying(false);
-      
-      toast({
-        title: `Restored to "${version.name}"`,
-        description: "The test cases have been reverted to this version",
-        duration: 3000,
-      });
-    }, 1500);
+    toast({
+      title: `Restored to "${version.name}"`,
+      description: "The test cases have been reverted to this version",
+      duration: 3000,
+    });
   };
 
   return (

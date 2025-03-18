@@ -12,7 +12,6 @@ const Workspace: React.FC = () => {
   const isMobile = useIsMobile();
   const [activePanel, setActivePanel] = useState<'left' | 'center' | 'right'>(isMobile ? 'center' : 'center');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isAiModifying, setIsAiModifying] = useState(false);
   const [leftVisible, setLeftVisible] = useState(!isMobile);
   const [rightVisible, setRightVisible] = useState(!isMobile);
 
@@ -21,10 +20,6 @@ const Workspace: React.FC = () => {
     setTimeout(() => {
       setIsGenerating(false);
     }, 3000);
-  };
-
-  const handleAiModifying = (isModifying: boolean) => {
-    setIsAiModifying(isModifying);
   };
 
   return (
@@ -50,7 +45,7 @@ const Workspace: React.FC = () => {
           {activePanel === 'center' && (
             <div className="w-full animate-fade-in">
               <ErrorBoundary>
-                <CenterPanel isGenerating={isGenerating} isAiModifying={isAiModifying} />
+                <CenterPanel isGenerating={isGenerating} />
               </ErrorBoundary>
               <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                 <Button
@@ -76,7 +71,7 @@ const Workspace: React.FC = () => {
           {activePanel === 'right' && (
             <div className="animate-slide-in-right absolute inset-0 z-10 bg-background">
               <ErrorBoundary>
-                <RightPanel onAiModifying={handleAiModifying} />
+                <RightPanel />
               </ErrorBoundary>
               <Button
                 variant="outline"
@@ -106,7 +101,7 @@ const Workspace: React.FC = () => {
           <div className={`panel-transition flex-1 flex ${!leftVisible && !rightVisible ? 'mx-auto max-w-4xl' : ''}`}>
             <div className="relative w-full">
               <ErrorBoundary>
-                <CenterPanel isGenerating={isGenerating} isAiModifying={isAiModifying} />
+                <CenterPanel isGenerating={isGenerating} />
               </ErrorBoundary>
               
               {!leftVisible && (
@@ -140,7 +135,7 @@ const Workspace: React.FC = () => {
           >
             {rightVisible && (
               <ErrorBoundary>
-                <RightPanel onAiModifying={handleAiModifying} />
+                <RightPanel />
               </ErrorBoundary>
             )}
           </div>
