@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import TestCase, { TestCaseProps } from "./TestCase";
 import { Button } from "@/components/ui/button";
@@ -192,7 +191,7 @@ const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false, isAiMod
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Scenarios</SelectItem>
+                <SelectItem value="all">All Scenarios</SelectItem>
                 {scenarios.map((s) => (
                   <SelectItem key={s} value={s}>{s}</SelectItem>
                 ))}
@@ -206,7 +205,7 @@ const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false, isAiMod
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Priorities</SelectItem>
+                <SelectItem value="all">All Priorities</SelectItem>
                 <SelectItem value="high">High</SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
                 <SelectItem value="low">Low</SelectItem>
