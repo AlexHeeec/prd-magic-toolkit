@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import TestCase, { TestCaseProps } from "./TestCase";
 import { Button } from "@/components/ui/button";
@@ -105,9 +106,10 @@ const mockTestCases: TestCaseProps[] = [
 
 interface CenterPanelProps {
   isGenerating?: boolean;
+  isAiModifying?: boolean;
 }
 
-const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false }) => {
+const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false, isAiModifying = false }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [scenario, setScenario] = useState<string>("");
   const [priority, setPriority] = useState<string>("");
@@ -115,8 +117,11 @@ const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false }) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (isGenerating) {
-      setTestCases([]);
+    if (isGenerating || isAiModifying) {
+      if (isGenerating) {
+        setTestCases([]);
+      }
+      
       const interval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 100) {
@@ -133,7 +138,7 @@ const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false }) => {
       setTestCases(mockTestCases);
       setProgress(100);
     }
-  }, [isGenerating]);
+  }, [isGenerating, isAiModifying]);
 
   const filteredTestCases = testCases.filter((testCase) => {
     const matchesSearch = searchTerm === "" || 
@@ -162,12 +167,14 @@ const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false }) => {
         </div>
       </div>
       
-      {isGenerating || progress < 100 ? (
+      {(isGenerating || isAiModifying || progress < 100) ? (
         <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-4">
           <div className="w-full max-w-xs">
             <Progress value={progress} className="h-2" />
           </div>
-          <p className="text-muted-foreground">Generating test cases...</p>
+          <p className="text-muted-foreground">
+            {isGenerating ? "Generating test cases..." : "Updating test cases..."}
+          </p>
         </div>
       ) : (
         <>
@@ -188,7 +195,7 @@ const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false }) => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all-scenarios">All Scenarios</SelectItem>
+                <SelectItem value="">All Scenarios</SelectItem>
                 {scenarios.map((s) => (
                   <SelectItem key={s} value={s}>{s}</SelectItem>
                 ))}
@@ -202,7 +209,7 @@ const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false }) => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all-priorities">All Priorities</SelectItem>
+                <SelectItem value="">All Priorities</SelectItem>
                 <SelectItem value="high">High</SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
                 <SelectItem value="low">Low</SelectItem>
