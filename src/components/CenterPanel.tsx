@@ -111,8 +111,8 @@ interface CenterPanelProps {
 
 const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false, isAiModifying = false }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [scenario, setScenario] = useState<string>("all");
-  const [priority, setPriority] = useState<string>("all");
+  const [scenario, setScenario] = useState<string>("");
+  const [priority, setPriority] = useState<string>("");
   const [testCases, setTestCases] = useState<TestCaseProps[]>([]);
   const [progress, setProgress] = useState(0);
 
@@ -195,7 +195,7 @@ const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false, isAiMod
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Scenarios</SelectItem>
+                <SelectItem value="">All Scenarios</SelectItem>
                 {scenarios.map((s) => (
                   <SelectItem key={s} value={s}>{s}</SelectItem>
                 ))}
@@ -209,7 +209,7 @@ const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false, isAiMod
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Priorities</SelectItem>
+                <SelectItem value="">All Priorities</SelectItem>
                 <SelectItem value="high">High</SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
                 <SelectItem value="low">Low</SelectItem>
@@ -256,8 +256,8 @@ const CenterPanel: React.FC<CenterPanelProps> = ({ isGenerating = false, isAiMod
                 className="mt-2"
                 onClick={() => {
                   setSearchTerm("");
-                  setScenario("all");
-                  setPriority("all");
+                  setScenario("");
+                  setPriority("");
                 }}
               >
                 Clear filters
