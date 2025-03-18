@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -83,7 +82,12 @@ const getAIResponse = (userInput: string): string => {
   }
 };
 
-const RightPanel: React.FC = () => {
+interface RightPanelProps {
+  isGenerating?: boolean;
+  onAiModifying?: (isModifying: boolean) => void;
+}
+
+const RightPanel: React.FC<RightPanelProps> = ({ isGenerating = false, onAiModifying }) => {
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [versions, setVersions] = useState<Version[]>(mockVersions);
   const [newMessage, setNewMessage] = useState("");
@@ -99,6 +103,26 @@ const RightPanel: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Show loading state when test cases are being generated
+  useEffect(() => {
+    if (isGenerating) {
+      const generatingMessage: Message = {
+        id: Date.now().toString(),
+        content: "Generating test cases based on the provided input...",
+        sender: "ai",
+        timestamp: new Date(),
+      };
+      
+      setMessages((prev) => [...prev, generatingMessage]);
+      setIsTyping(true);
+      
+      // Reset typing indicator when generation is complete
+      return () => {
+        setIsTyping(false);
+      };
+    }
+  }, [isGenerating]);
+
   const handleSendMessage = () => {
     if (newMessage.trim() === "") return;
     
@@ -112,6 +136,11 @@ const RightPanel: React.FC = () => {
     setMessages((prev) => [...prev, userMessage]);
     setNewMessage("");
     setIsTyping(true);
+    
+    // Call the onAiModifying callback to indicate AI is processing changes
+    if (onAiModifying) {
+      onAiModifying(true);
+    }
     
     // Simulate AI processing and response
     setTimeout(() => {
@@ -144,6 +173,11 @@ const RightPanel: React.FC = () => {
           duration: 3000,
         });
       }
+      
+      // Notify that AI has finished modifying
+      if (onAiModifying) {
+        onAiModifying(false);
+      }
     }, 1500);
   };
 
@@ -163,11 +197,24 @@ const RightPanel: React.FC = () => {
   };
 
   const handleRestoreVersion = (version: Version) => {
-    toast({
-      title: `Restored to "${version.name}"`,
-      description: "The test cases have been reverted to this version",
-      duration: 3000,
-    });
+    // Indicate that AI is modifying test cases
+    if (onAiModifying) {
+      onAiModifying(true);
+    }
+    
+    // Simulate restoration time
+    setTimeout(() => {
+      toast({
+        title: `Restored to "${version.name}"`,
+        description: "The test cases have been reverted to this version",
+        duration: 3000,
+      });
+      
+      // Notify that AI has finished modifying
+      if (onAiModifying) {
+        onAiModifying(false);
+      }
+    }, 1000);
   };
 
   return (
