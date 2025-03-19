@@ -11,8 +11,18 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User, Settings, HelpCircle } from "lucide-react";
+import { LogOut, TestTube } from "lucide-react";
 import { toast } from "sonner";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
 
 const Header: React.FC = () => {
   const { user, logout } = useAuth();
@@ -42,20 +52,25 @@ const Header: React.FC = () => {
         <div className="relative h-8 w-8">
           <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse"></div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <LogOut className="h-4 w-4 text-primary" />
+            <TestTube className="h-4 w-4 text-primary" />
           </div>
         </div>
-        <h1 className="text-xl font-medium">PRD Magic Toolkit</h1>
+        <h1 className="text-xl font-medium">AIGenTest</h1>
       </div>
 
       <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-          <HelpCircle className="h-5 w-5" />
-        </Button>
-        
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-          <Settings className="h-5 w-5" />
-        </Button>
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuLink 
+                className={cn(navigationMenuTriggerStyle(), "bg-accent/50")} 
+                href="/"
+              >
+                Workspace
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -73,15 +88,6 @@ const Header: React.FC = () => {
                 <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
