@@ -56,9 +56,7 @@ const Header: React.FC = () => {
           </div>
         </div>
         <h1 className="text-xl font-medium">AIGenTest</h1>
-      </div>
-
-      <div className="flex items-center space-x-4">
+        
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
@@ -71,7 +69,9 @@ const Header: React.FC = () => {
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
-        
+      </div>
+
+      <div className="flex items-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-9 w-9 rounded-full">
