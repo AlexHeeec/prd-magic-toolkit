@@ -20,7 +20,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 
@@ -61,10 +60,11 @@ const Header: React.FC = () => {
           <NavigationMenuList>
             <NavigationMenuItem>
               <NavigationMenuLink 
-                className={cn(navigationMenuTriggerStyle(), "bg-accent/50")} 
+                className="px-4 py-2 text-sm font-medium relative group"
                 href="/"
               >
                 Workspace
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary scale-x-100 transition-transform" />
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
