@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -90,7 +90,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   };
 
   // If a test case is selected but we're not on the history tab, switch to it
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedHistoryItem && activeTab !== "history") {
       setActiveTab("history");
     }

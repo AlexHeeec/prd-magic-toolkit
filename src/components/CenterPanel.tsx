@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import TestCase, { TestCaseProps } from "./TestCase";
 import { Button } from "@/components/ui/button";
@@ -112,6 +111,27 @@ const historyTestCaseMapping: { [key: string]: TestCaseProps[] } = {
   "4": mockTestCases.filter(tc => tc.scenario === "Authentication" && tc.priority === "low")
 };
 
+// Mapping from test cases to history items
+const getHistoryItemForTestCases = (testCases: TestCaseProps[]): string | undefined => {
+  // Simple matching algorithm - find a history item with the most matching test cases
+  let bestMatch: string | undefined = undefined;
+  let maxMatches = 0;
+  
+  Object.entries(historyTestCaseMapping).forEach(([historyId, historyCases]) => {
+    // Count how many test cases match
+    const matches = historyCases.filter(hCase => 
+      testCases.some(tc => tc.id === hCase.id)
+    ).length;
+    
+    if (matches > maxMatches) {
+      maxMatches = matches;
+      bestMatch = historyId;
+    }
+  });
+  
+  return bestMatch;
+};
+
 interface CenterPanelProps {
   isGenerating?: boolean;
   isAiModifying?: boolean;
@@ -157,10 +177,27 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
         setTestCases(historyTestCaseMapping[selectedHistoryItem]);
       } else {
         setTestCases(mockTestCases);
+        
+        // If no history item is selected but test cases are loaded,
+        // try to find which history item they belong to
+        const historyItem = getHistoryItemForTestCases(mockTestCases);
+        if (historyItem) {
+          onHistoryItemChange(historyItem);
+        }
       }
       setProgress(100);
     }
-  }, [isGenerating, isAiModifying, selectedHistoryItem]);
+  }, [isGenerating, isAiModifying, selectedHistoryItem, onHistoryItemChange]);
+
+  // When test cases change, try to find the matching history item
+  useEffect(() => {
+    if (!selectedHistoryItem && testCases.length > 0 && !isGenerating && !isAiModifying) {
+      const historyItem = getHistoryItemForTestCases(testCases);
+      if (historyItem) {
+        onHistoryItemChange(historyItem);
+      }
+    }
+  }, [testCases, selectedHistoryItem, onHistoryItemChange, isGenerating, isAiModifying]);
 
   const filteredTestCases = testCases.filter((testCase) => {
     const matchesSearch = searchTerm === "" || 
