@@ -47,7 +47,7 @@ const Workspace: React.FC = () => {
       <div className="w-1/4 min-w-[300px] max-w-[400px]">
         <RightPanel 
           isGenerating={isGenerating}
-          isAiModifying={isAiModifying}
+          onAiModifying={handleAiAction}
         />
       </div>
     </div>
