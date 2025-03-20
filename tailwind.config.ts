@@ -117,6 +117,20 @@ export default {
 				'shimmer': {
 					from: { backgroundPosition: '200% 0' },
 					to: { backgroundPosition: '-200% 0' }
+				},
+				'pulse-glow': {
+					'0%, 100%': { 
+						'box-shadow': '0 0 0 0 rgba(139, 92, 246, 0.7)',
+						opacity: '1' 
+					},
+					'50%': { 
+						'box-shadow': '0 0 10px 5px rgba(139, 92, 246, 0.4)',
+						opacity: '0.8' 
+					}
+				},
+				'matrix-bg': {
+					'0%': { backgroundPosition: '0% 0%' },
+					'100%': { backgroundPosition: '100% 100%' }
 				}
 			},
 			animation: {
@@ -131,7 +145,9 @@ export default {
 				'scale-in': 'scale-in 0.2s ease-out',
 				'scale-out': 'scale-out 0.2s ease-out',
 				'float': 'float 6s ease-in-out infinite',
-				'shimmer': 'shimmer 3s linear infinite'
+				'shimmer': 'shimmer 3s linear infinite',
+				'pulse-glow': 'pulse-glow 3s infinite',
+				'matrix-bg': 'matrix-bg 20s infinite alternate'
 			},
 			fontFamily: {
 				sans: ['SF Pro Display', 'Inter', 'sans-serif'],
@@ -145,10 +161,17 @@ export default {
 			boxShadow: {
 				'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
 				'elegant': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
-				'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02)'
+				'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02)',
+				'tech': '0 0 15px rgba(139, 92, 246, 0.5)',
+				'inner-glow': 'inset 0 0 15px rgba(139, 92, 246, 0.3)'
 			},
 			backdropBlur: {
 				'xs': '2px',
+			},
+			backgroundImage: {
+				'tech-grid': 'radial-gradient(#8b5cf6 1px, transparent 1px)',
+				'tech-gradient': 'linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%)',
+				'dark-tech': 'linear-gradient(to right, #1A1F2C 0%, #242e4c 100%)',
 			}
 		}
 	},
