@@ -52,14 +52,14 @@ const TestCase: React.FC<TestCaseProps> = ({
   };
 
   return (
-    <Card className={`w-full transition-all duration-300 overflow-hidden ${isDeleting ? 'opacity-0 scale-95' : 'opacity-100 scale-100'} hover:shadow-md`}>
+    <Card className={`w-full transition-all duration-300 overflow-hidden ${isDeleting ? 'opacity-0 scale-95' : 'opacity-100 scale-100'} hover:shadow-md border-primary/10`}>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CardHeader className="p-4 pb-2">
+        <CardHeader className="p-4 pb-2 bg-gradient-to-r from-white to-secondary/20 dark:from-secondary/50 dark:to-secondary/30">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <CardTitle className="text-base">{title}</CardTitle>
               <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="bg-accent/30">{scenario}</Badge>
+                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">{scenario}</Badge>
                 <Badge variant={priorityColor[priority] as any}>
                   {priority === "high" ? (
                     <AlertCircle className="h-3 w-3 mr-1" />
@@ -72,7 +72,7 @@ const TestCase: React.FC<TestCaseProps> = ({
             </div>
             <div className="flex space-x-1">
               <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-7 px-2">
+                <Button variant="ghost" size="sm" className="h-7 px-2 text-primary hover:bg-primary/10">
                   {isOpen ? (
                     <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -86,7 +86,7 @@ const TestCase: React.FC<TestCaseProps> = ({
               </CollapsibleTrigger>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-7 px-2">
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-primary hover:bg-primary/10">
                     <MoreHorizontal className="h-4 w-4" />
                     <span className="sr-only">Actions</span>
                   </Button>
@@ -114,7 +114,7 @@ const TestCase: React.FC<TestCaseProps> = ({
           <CardContent className="p-4 pt-0">
             <div className="space-y-3">
               <div>
-                <h4 className="text-xs font-medium text-muted-foreground mb-1">Preconditions</h4>
+                <h4 className="text-xs font-medium text-primary mb-1">Preconditions</h4>
                 <ul className="list-disc list-inside text-sm space-y-1">
                   {preconditions.map((condition, index) => (
                     <li key={index}>{condition}</li>
@@ -122,7 +122,7 @@ const TestCase: React.FC<TestCaseProps> = ({
                 </ul>
               </div>
               <div>
-                <h4 className="text-xs font-medium text-muted-foreground mb-1">Steps</h4>
+                <h4 className="text-xs font-medium text-primary mb-1">Steps</h4>
                 <ol className="list-decimal list-inside text-sm space-y-1">
                   {steps.map((step, index) => (
                     <li key={index}>{step}</li>
@@ -130,7 +130,7 @@ const TestCase: React.FC<TestCaseProps> = ({
                 </ol>
               </div>
               <div>
-                <h4 className="text-xs font-medium text-muted-foreground mb-1">Expected Results</h4>
+                <h4 className="text-xs font-medium text-primary mb-1">Expected Results</h4>
                 <ul className="list-disc list-inside text-sm space-y-1">
                   {expectedResults.map((result, index) => (
                     <li key={index}>{result}</li>

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileDown, BarChart2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Task } from "./Workspace";
+import { exportTestCasesToExcel } from "@/utils/excelExport";
 
 // Mock test case data for each task
 const taskTestCasesMap: { [key: string]: TestCaseProps[] } = {
@@ -201,15 +202,28 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
       
     return matchesSearch && matchesPriority;
   });
+
+  const handleExport = () => {
+    if (filteredTestCases.length === 0) return;
+    
+    const filename = `test-cases-${activeTask?.title || 'all'}-${new Date().toISOString().split('T')[0]}.xlsx`;
+    exportTestCasesToExcel(filteredTestCases, filename);
+  };
   
   return (
-    <div className="panel-transition w-full h-full p-4 flex flex-col">
+    <div className="panel-transition w-full h-full p-4 flex flex-col bg-white/80 dark:bg-secondary/50 backdrop-blur-sm border border-border rounded-lg">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-medium">
           {activeTask ? `Test Cases: ${activeTask.title}` : 'Test Cases'}
         </h2>
         <div className="flex space-x-2">
-          <Button variant="outline" size="sm" className="h-8">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-8 border-primary/30 hover:bg-primary/10 text-primary"
+            onClick={handleExport}
+            disabled={filteredTestCases.length === 0}
+          >
             <FileDown className="h-4 w-4 mr-1" />
             <span>Export</span>
           </Button>

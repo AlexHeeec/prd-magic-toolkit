@@ -162,15 +162,15 @@ export default {
 				'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
 				'elegant': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
 				'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02)',
-				'tech': '0 0 15px rgba(139, 92, 246, 0.5)',
-				'inner-glow': 'inset 0 0 15px rgba(139, 92, 246, 0.3)'
+				'tech': '0 0 15px rgba(59, 130, 246, 0.5)',
+				'inner-glow': 'inset 0 0 15px rgba(59, 130, 246, 0.3)'
 			},
 			backdropBlur: {
 				'xs': '2px',
 			},
 			backgroundImage: {
-				'tech-grid': 'radial-gradient(#8b5cf6 1px, transparent 1px)',
-				'tech-gradient': 'linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%)',
+				'tech-grid': 'radial-gradient(#3b82f6 1px, transparent 1px)',
+				'tech-gradient': 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)',
 				'dark-tech': 'linear-gradient(to right, #1A1F2C 0%, #242e4c 100%)',
 			}
 		}
