@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -231,7 +230,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
   };
 
   return (
-    <div className="panel-transition w-full h-full flex flex-col bg-sidebar rounded-xl">
+    <div className="panel-transition w-full h-full flex flex-col bg-white rounded-xl border border-primary/20 shadow-sm">
       <Tabs defaultValue="chat" className="w-full h-full flex flex-col">
         <TabsList className="grid grid-cols-2 m-4 mb-0">
           <TabsTrigger value="chat" className="flex items-center gap-1">
