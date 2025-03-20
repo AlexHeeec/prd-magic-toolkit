@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import TestCase, { TestCaseProps } from "./TestCase";
 import { Button } from "@/components/ui/button";
@@ -6,144 +7,158 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileDown, BarChart2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Task } from "./Workspace";
 
-// Mock test case data
-const mockTestCases: TestCaseProps[] = [
-  {
-    id: "1",
-    title: "Verify User Login with Valid Credentials",
-    preconditions: ["User has registered an account", "User has a valid username and password"],
-    steps: [
-      "Navigate to the login page",
-      "Enter valid username",
-      "Enter valid password",
-      "Click on login button"
-    ],
-    expectedResults: [
-      "User should be logged in successfully",
-      "User should be redirected to the dashboard",
-      "Welcome message should be displayed"
-    ],
-    scenario: "Authentication",
-    priority: "high"
-  },
-  {
-    id: "2",
-    title: "Check Password Reset Functionality",
-    preconditions: ["User has registered an account"],
-    steps: [
-      "Navigate to the login page",
-      "Click on 'Forgot Password' link",
-      "Enter registered email",
-      "Submit the form",
-      "Check email for reset link",
-      "Click on the reset link",
-      "Enter new password",
-      "Confirm new password",
-      "Submit the form"
-    ],
-    expectedResults: [
-      "Password reset email should be sent",
-      "User should be able to reset password",
-      "User should be able to login with new password"
-    ],
-    scenario: "Authentication",
-    priority: "medium"
-  },
-  {
-    id: "3",
-    title: "Validate User Registration Form",
-    preconditions: ["Registration page is accessible"],
-    steps: [
-      "Navigate to registration page",
-      "Enter invalid email format",
-      "Enter password less than 8 characters",
-      "Submit the form"
-    ],
-    expectedResults: [
-      "Form submission should fail",
-      "Error message for invalid email should be displayed",
-      "Error message for password length should be displayed"
-    ],
-    scenario: "Registration",
-    priority: "medium"
-  },
-  {
-    id: "4",
-    title: "Test User Logout Functionality",
-    preconditions: ["User is logged in"],
-    steps: [
-      "Click on the user avatar",
-      "Select 'Logout' option from the dropdown"
-    ],
-    expectedResults: [
-      "User should be logged out",
-      "User should be redirected to the login page",
-      "Session should be invalidated"
-    ],
-    scenario: "Authentication",
-    priority: "low"
-  },
-  {
-    id: "5",
-    title: "Verify Profile Information Update",
-    preconditions: ["User is logged in", "User is on the profile page"],
-    steps: [
-      "Click on 'Edit Profile' button",
-      "Update name, email, and bio",
-      "Click on 'Save Changes' button"
-    ],
-    expectedResults: [
-      "Profile should be updated successfully",
-      "Success message should be displayed",
-      "Updated information should be visible on the profile page"
-    ],
-    scenario: "Profile Management",
-    priority: "medium"
-  }
-];
-
-// Mapping history items to test case sets (in a real app, this would come from the backend)
-const historyTestCaseMapping: { [key: string]: TestCaseProps[] } = {
-  "1": mockTestCases.filter(tc => tc.scenario === "Authentication" || tc.scenario === "Registration").slice(0, 4),
-  "2": mockTestCases.filter(tc => tc.priority === "high" || tc.priority === "medium").slice(1, 4),
-  "3": mockTestCases.filter(tc => tc.scenario === "Profile Management"),
-  "4": mockTestCases.filter(tc => tc.scenario === "Authentication" && tc.priority === "low")
-};
-
-// Mapping from test cases to history items
-const getHistoryItemForTestCases = (testCases: TestCaseProps[]): string | undefined => {
-  // Simple matching algorithm - find a history item with the most matching test cases
-  let bestMatch: string | undefined = undefined;
-  let maxMatches = 0;
-  
-  Object.entries(historyTestCaseMapping).forEach(([historyId, historyCases]) => {
-    // Count how many test cases match
-    const matches = historyCases.filter(hCase => 
-      testCases.some(tc => tc.id === hCase.id)
-    ).length;
-    
-    if (matches > maxMatches) {
-      maxMatches = matches;
-      bestMatch = historyId;
-    }
-  });
-  
-  return bestMatch;
+// Mock test case data for each task
+const taskTestCasesMap: { [key: string]: TestCaseProps[] } = {
+  "1": [
+    {
+      id: "1-tc1",
+      title: "Verify User Login with Valid Credentials",
+      preconditions: ["User has registered an account", "User has a valid username and password"],
+      steps: [
+        "Navigate to the login page",
+        "Enter valid username",
+        "Enter valid password",
+        "Click on login button"
+      ],
+      expectedResults: [
+        "User should be logged in successfully",
+        "User should be redirected to the dashboard",
+        "Welcome message should be displayed"
+      ],
+      scenario: "Authentication",
+      priority: "high"
+    },
+    {
+      id: "1-tc2",
+      title: "Check Password Reset Functionality",
+      preconditions: ["User has registered an account"],
+      steps: [
+        "Navigate to the login page",
+        "Click on 'Forgot Password' link",
+        "Enter registered email",
+        "Submit the form",
+        "Check email for reset link",
+        "Click on the reset link",
+        "Enter new password",
+        "Confirm new password",
+        "Submit the form"
+      ],
+      expectedResults: [
+        "Password reset email should be sent",
+        "User should be able to reset password",
+        "User should be able to login with new password"
+      ],
+      scenario: "Authentication",
+      priority: "medium"
+    },
+    {
+      id: "1-tc3",
+      title: "Validate User Registration Form",
+      preconditions: ["Registration page is accessible"],
+      steps: [
+        "Navigate to registration page",
+        "Enter invalid email format",
+        "Enter password less than 8 characters",
+        "Submit the form"
+      ],
+      expectedResults: [
+        "Form submission should fail",
+        "Error message for invalid email should be displayed",
+        "Error message for password length should be displayed"
+      ],
+      scenario: "Registration",
+      priority: "medium"
+    },
+  ],
+  "2": [
+    {
+      id: "2-tc1",
+      title: "Verify Credit Card Payment",
+      preconditions: ["User is logged in", "User has items in cart"],
+      steps: [
+        "Navigate to checkout page",
+        "Select credit card payment method",
+        "Enter valid credit card details",
+        "Submit payment"
+      ],
+      expectedResults: [
+        "Payment should be processed successfully",
+        "Order confirmation page should be displayed",
+        "Confirmation email should be sent to the user"
+      ],
+      scenario: "Payment",
+      priority: "high"
+    },
+    {
+      id: "2-tc2",
+      title: "Handle Payment Failure",
+      preconditions: ["User is logged in", "User has items in cart"],
+      steps: [
+        "Navigate to checkout page",
+        "Select credit card payment method",
+        "Enter invalid credit card details",
+        "Submit payment"
+      ],
+      expectedResults: [
+        "Payment should fail",
+        "Error message should be displayed",
+        "User should be able to retry payment"
+      ],
+      scenario: "Payment",
+      priority: "high"
+    },
+  ],
+  "3": [
+    {
+      id: "3-tc1",
+      title: "Verify Profile Information Update",
+      preconditions: ["User is logged in", "User is on the profile page"],
+      steps: [
+        "Click on 'Edit Profile' button",
+        "Update name, email, and bio",
+        "Click on 'Save Changes' button"
+      ],
+      expectedResults: [
+        "Profile should be updated successfully",
+        "Success message should be displayed",
+        "Updated information should be visible on the profile page"
+      ],
+      scenario: "Profile Management",
+      priority: "medium"
+    },
+  ],
+  "4": [
+    {
+      id: "4-tc1",
+      title: "Test User Logout Functionality",
+      preconditions: ["User is logged in"],
+      steps: [
+        "Click on the user avatar",
+        "Select 'Logout' option from the dropdown"
+      ],
+      expectedResults: [
+        "User should be logged out",
+        "User should be redirected to the login page",
+        "Session should be invalidated"
+      ],
+      scenario: "Authentication",
+      priority: "low"
+    },
+  ],
 };
 
 interface CenterPanelProps {
   isGenerating?: boolean;
   isAiModifying?: boolean;
-  selectedHistoryItem?: string;
-  onHistoryItemChange: (historyId: string) => void;
+  activeTask?: Task;
 }
 
 const CenterPanel: React.FC<CenterPanelProps> = ({ 
   isGenerating = false, 
   isAiModifying = false,
-  selectedHistoryItem,
-  onHistoryItemChange
+  activeTask
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [priority, setPriority] = useState<string>("all");
@@ -157,11 +172,8 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
         setProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
-            // If a history item is selected, show its test cases
-            if (selectedHistoryItem && historyTestCaseMapping[selectedHistoryItem]) {
-              setTestCases(historyTestCaseMapping[selectedHistoryItem]);
-            } else {
-              setTestCases(mockTestCases);
+            if (activeTask) {
+              setTestCases(taskTestCasesMap[activeTask.id] || []);
             }
             return 100;
           }
@@ -171,32 +183,14 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
       
       return () => clearInterval(interval);
     } else {
-      // If a history item is selected, show its test cases
-      if (selectedHistoryItem && historyTestCaseMapping[selectedHistoryItem]) {
-        setTestCases(historyTestCaseMapping[selectedHistoryItem]);
+      if (activeTask) {
+        setTestCases(taskTestCasesMap[activeTask.id] || []);
       } else {
-        setTestCases(mockTestCases);
-        
-        // If no history item is selected but test cases are loaded,
-        // try to find which history item they belong to
-        const historyItem = getHistoryItemForTestCases(mockTestCases);
-        if (historyItem) {
-          onHistoryItemChange(historyItem);
-        }
+        setTestCases([]);
       }
       setProgress(100);
     }
-  }, [isGenerating, isAiModifying, selectedHistoryItem, onHistoryItemChange]);
-
-  // When test cases change, try to find the matching history item
-  useEffect(() => {
-    if (!selectedHistoryItem && testCases.length > 0 && !isGenerating && !isAiModifying) {
-      const historyItem = getHistoryItemForTestCases(testCases);
-      if (historyItem) {
-        onHistoryItemChange(historyItem);
-      }
-    }
-  }, [testCases, selectedHistoryItem, onHistoryItemChange, isGenerating, isAiModifying]);
+  }, [isGenerating, isAiModifying, activeTask]);
 
   const filteredTestCases = testCases.filter((testCase) => {
     const matchesSearch = searchTerm === "" || 
@@ -211,7 +205,9 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
   return (
     <div className="panel-transition w-full h-full p-4 flex flex-col">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-medium">Test Cases</h2>
+        <h2 className="text-lg font-medium">
+          {activeTask ? `Test Cases: ${activeTask.title}` : 'Test Cases'}
+        </h2>
         <div className="flex space-x-2">
           <Button variant="outline" size="sm" className="h-8">
             <FileDown className="h-4 w-4 mr-1" />
@@ -285,17 +281,21 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
             </ScrollArea>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-8">
-              <p className="text-muted-foreground">No test cases found matching your filters.</p>
-              <Button 
-                variant="link" 
-                className="mt-2"
-                onClick={() => {
-                  setSearchTerm("");
-                  setPriority("all");
-                }}
-              >
-                Clear filters
-              </Button>
+              <p className="text-muted-foreground">
+                {activeTask ? 'No test cases found matching your filters.' : 'Select a task to view test cases.'}
+              </p>
+              {activeTask && (
+                <Button 
+                  variant="link" 
+                  className="mt-2"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setPriority("all");
+                  }}
+                >
+                  Clear filters
+                </Button>
+              )}
             </div>
           )}
         </>

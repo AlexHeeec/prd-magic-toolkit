@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,52 +20,20 @@ import {
   CardHeader,
   CardTitle 
 } from "@/components/ui/card";
-
-export interface HistoryItem {
-  id: string;
-  title: string;
-  date: string;
-  caseCount: number;
-}
-
-// Mock history data
-const mockHistory: HistoryItem[] = [
-  {
-    id: "1",
-    title: "User Authentication Flow",
-    date: "2023-09-15",
-    caseCount: 12
-  },
-  {
-    id: "2",
-    title: "Payment Processing Module",
-    date: "2023-09-10",
-    caseCount: 18
-  },
-  {
-    id: "3",
-    title: "Profile Management",
-    date: "2023-09-01",
-    caseCount: 15
-  },
-  {
-    id: "4",
-    title: "Dashboard Analytics",
-    date: "2023-09-05",
-    caseCount: 8
-  }
-];
+import { Task } from "./Workspace";
 
 interface LeftPanelProps {
   onGenerate: () => void;
-  selectedHistoryItem?: string;
-  onHistoryItemSelect: (historyId: string) => void;
+  tasks: Task[];
+  activeTaskId?: string;
+  onTaskSelect: (taskId: string) => void;
 }
 
 const LeftPanel: React.FC<LeftPanelProps> = ({ 
   onGenerate, 
-  selectedHistoryItem,
-  onHistoryItemSelect 
+  tasks,
+  activeTaskId,
+  onTaskSelect 
 }) => {
   const [prdInput, setPrdInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -86,15 +55,15 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
     }, 1500);
   };
 
-  // If a test case is selected but we're not on the history tab, switch to it
+  // If a task is selected but we're not on the history tab, switch to it
   useEffect(() => {
-    if (selectedHistoryItem && activeTab !== "history") {
+    if (activeTaskId && activeTab !== "history") {
       setActiveTab("history");
     }
-  }, [selectedHistoryItem]);
+  }, [activeTaskId]);
 
-  const handleHistoryItemClick = (historyId: string) => {
-    onHistoryItemSelect(historyId);
+  const handleTaskClick = (taskId: string) => {
+    onTaskSelect(taskId);
   };
 
   const hasContent = prdInput.length > 0 || selectedFile !== null;
@@ -111,7 +80,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
           </TabsTrigger>
           <TabsTrigger value="history" className="flex items-center gap-1">
             <History className="h-4 w-4" />
-            <span>History</span>
+            <span>Tasks</span>
           </TabsTrigger>
         </TabsList>
         
@@ -198,20 +167,20 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
         <TabsContent value="history" className="mt-0">
           <ScrollArea className="h-[450px] pr-4">
             <div className="space-y-3">
-              {mockHistory.map((item) => (
+              {tasks.map((task) => (
                 <Card 
-                  key={item.id} 
+                  key={task.id} 
                   className={`hover:bg-accent/10 transition-colors cursor-pointer ${
-                    selectedHistoryItem === item.id ? "bg-accent/20 ring-1 ring-accent" : ""
+                    activeTaskId === task.id ? "bg-accent/20 ring-1 ring-accent" : ""
                   }`}
-                  onClick={() => handleHistoryItemClick(item.id)}
+                  onClick={() => handleTaskClick(task.id)}
                 >
                   <CardHeader className="p-4 pb-2">
-                    <CardTitle className="text-base truncate">{item.title}</CardTitle>
-                    <CardDescription className="text-xs">{item.date}</CardDescription>
+                    <CardTitle className="text-base truncate">{task.title}</CardTitle>
+                    <CardDescription className="text-xs">{task.date}</CardDescription>
                   </CardHeader>
                   <CardFooter className="p-4 pt-0 flex justify-between">
-                    <span className="text-xs text-muted-foreground">{item.caseCount} test cases</span>
+                    <span className="text-xs text-muted-foreground">{task.caseCount} test cases</span>
                     <Button variant="ghost" size="sm" className="h-7 px-2">
                       <FileText className="h-3.5 w-3.5" />
                       <span className="sr-only">View</span>
