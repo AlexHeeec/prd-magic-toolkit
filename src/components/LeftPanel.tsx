@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   FileUp,
-  Link as LinkIcon,
   Text,
   FileText,
   Play,
@@ -69,7 +67,6 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   onHistoryItemSelect 
 }) => {
   const [prdInput, setPrdInput] = useState("");
-  const [prdUrl, setPrdUrl] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState("input");
@@ -100,7 +97,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
     onHistoryItemSelect(historyId);
   };
 
-  const hasContent = prdInput.length > 0 || prdUrl.length > 0 || selectedFile !== null;
+  const hasContent = prdInput.length > 0 || selectedFile !== null;
 
   return (
     <div className="panel-transition w-full h-full p-4 flex flex-col bg-sidebar rounded-xl">
@@ -121,7 +118,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
         <TabsContent value="input" className="mt-0 space-y-4">
           <div className="space-y-2">
             <Tabs defaultValue="text">
-              <TabsList className="grid grid-cols-3">
+              <TabsList className="grid grid-cols-2">
                 <TabsTrigger value="text" className="flex items-center gap-1">
                   <Text className="h-3 w-3" />
                   <span>Text</span>
@@ -129,10 +126,6 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
                 <TabsTrigger value="file" className="flex items-center gap-1">
                   <FileUp className="h-3 w-3" />
                   <span>File</span>
-                </TabsTrigger>
-                <TabsTrigger value="url" className="flex items-center gap-1">
-                  <LinkIcon className="h-3 w-3" />
-                  <span>URL</span>
                 </TabsTrigger>
               </TabsList>
               
@@ -175,20 +168,6 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
                       </div>
                     )}
                   </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="url" className="mt-2">
-                <div className="space-y-2">
-                  <Input
-                    type="url"
-                    placeholder="Enter PRD document URL"
-                    value={prdUrl}
-                    onChange={(e) => setPrdUrl(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Enter a valid URL to a PRD document
-                  </p>
                 </div>
               </TabsContent>
             </Tabs>

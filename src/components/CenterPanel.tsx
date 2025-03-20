@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileDown, Filter, BarChart2 } from "lucide-react";
+import { FileDown, BarChart2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 // Mock test case data
@@ -146,7 +146,6 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
   onHistoryItemChange
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [scenario, setScenario] = useState<string>("all");
   const [priority, setPriority] = useState<string>("all");
   const [testCases, setTestCases] = useState<TestCaseProps[]>([]);
   const [progress, setProgress] = useState(0);
@@ -203,16 +202,11 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
     const matchesSearch = searchTerm === "" || 
       testCase.title.toLowerCase().includes(searchTerm.toLowerCase());
       
-    const matchesScenario = scenario === "all" || 
-      testCase.scenario === scenario;
-      
     const matchesPriority = priority === "all" || 
       testCase.priority === priority;
       
-    return matchesSearch && matchesScenario && matchesPriority;
+    return matchesSearch && matchesPriority;
   });
-  
-  const scenarios = Array.from(new Set(testCases.map(tc => tc.scenario)));
   
   return (
     <div className="panel-transition w-full h-full p-4 flex flex-col">
@@ -246,20 +240,6 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
                 className="h-8"
               />
             </div>
-            <Select value={scenario} onValueChange={setScenario}>
-              <SelectTrigger className="h-8 w-[180px]">
-                <div className="flex items-center">
-                  <Filter className="h-3.5 w-3.5 mr-1" />
-                  <SelectValue placeholder="Scenario" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Scenarios</SelectItem>
-                {scenarios.map((s) => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             <Select value={priority} onValueChange={setPriority}>
               <SelectTrigger className="h-8 w-[180px]">
                 <div className="flex items-center">
@@ -288,10 +268,6 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
                   <span className="text-muted-foreground ml-1">total cases</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="font-medium">{scenarios.length}</span>
-                  <span className="text-muted-foreground ml-1">scenarios</span>
-                </div>
-                <div className="flex items-center">
                   <span className="font-medium">{testCases.filter(tc => tc.priority === 'high').length}</span>
                   <span className="text-muted-foreground ml-1">high priority</span>
                 </div>
@@ -315,7 +291,6 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
                 className="mt-2"
                 onClick={() => {
                   setSearchTerm("");
-                  setScenario("all");
                   setPriority("all");
                 }}
               >

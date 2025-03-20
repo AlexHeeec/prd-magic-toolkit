@@ -47,16 +47,16 @@ const Header: React.FC = () => {
 
   return (
     <header className={`w-full py-4 px-6 glass-card flex items-center justify-between mb-6 transition-all duration-300 ${isAnimatingOut ? 'opacity-0 transform -translate-y-4' : 'opacity-100'}`}>
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center">
         <div className="relative h-8 w-8">
           <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse"></div>
           <div className="absolute inset-0 flex items-center justify-center">
             <TestTube className="h-4 w-4 text-primary" />
           </div>
         </div>
-        <h1 className="text-xl font-medium">AIGenTest</h1>
+        <h1 className="text-xl font-medium ml-4">AIGenTest</h1>
         
-        <NavigationMenu>
+        <NavigationMenu className="ml-8">
           <NavigationMenuList>
             <NavigationMenuItem>
               <NavigationMenuLink 
