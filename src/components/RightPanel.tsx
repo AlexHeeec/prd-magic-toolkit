@@ -16,57 +16,6 @@ interface Version {
   timestamp: Date;
   changes: string;
 }
-//更新
-const RightPanel: React.FC<RightPanelProps> = ({ 
-  isGenerating = false, 
-  onAiModifying,
-  activeTask,
-  onAddMessage
-}) => {
-  const [newMessage, setNewMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [versions, setVersions] = useState<Version[]>([]);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
-  const [prevActiveTaskId, setPrevActiveTaskId] = useState<string | undefined>(undefined);
-
-  // Update versions when activeTask changes
-  useEffect(() => {
-    if (activeTask) {
-      setVersions(taskVersionsMap[activeTask.id] || []);
-    } else {
-      setVersions([]);
-    }
-    setPrevActiveTaskId(activeTask?.id);
-  }, [activeTask]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [activeTask?.messages]);
-
-  // Show loading state when test cases are being generated
-  useEffect(() => {
-    if (isGenerating && activeTask && onAddMessage && prevActiveTaskId!== activeTask.id) {
-      const generatingMessage: Omit<Message, 'id'> = {
-        content: "Generating test cases based on the provided input...",
-        sender: "ai",
-        timestamp: new Date(),
-      };
-      
-      onAddMessage(generatingMessage);
-      setIsTyping(true);
-      
-      // Reset typing indicator when generation is complete
-      return () => {
-        setIsTyping(false);
-      };
-    }
-  }, [isGenerating, activeTask, onAddMessage, prevActiveTaskId]);
-//更新结束
 // Mock versions data for each task
 const taskVersionsMap: { [key: string]: Version[] } = {
   "1": [
