@@ -177,7 +177,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
           {activeTask ? (
             <div className="flex flex-col h-full">
               {/* 聊天内容区域，可滚动 */}
-              <div className="flex-1 overflow-y-auto pr-4 py-4">
+              <ScrollArea className="flex-1 pr-4 py-4">
                 <div className="space-y-4">
                   {activeTask.messages.map((message) => (
                     <div
@@ -243,7 +243,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
                   )}
                   <div ref={messagesEndRef} />
                 </div>
-              </div>
+              </ScrollArea>
               {/* 输入框和发送按钮区域，固定在底部 */}
               <div className="pt-3 relative flex-shrink-0">
                 <Textarea
@@ -277,7 +277,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
 
         <TabsContent value="versions" className="flex-1 flex flex-col p-4 pt-0 h-full overflow-hidden">
           {activeTask ? (
-            <ScrollArea className="h-[calc(400vh-200px)] pr-4 py-4">
+            <ScrollArea className="h-[calc(100vh-200px)] pr-4 py-4">
               <div className="space-y-3">
                 {versions.map((version) => (
                   <Card
