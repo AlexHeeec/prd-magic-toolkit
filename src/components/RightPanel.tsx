@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, History, Send, Bot, User, Trash, RotateCcw, Loader2 } from "lucide-react";
+import { MessageCircle, History, Send, Bot, User, Trash, RotateCcw, Loader2, Check } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Task, Message } from "./Workspace";
 
@@ -86,13 +86,17 @@ interface RightPanelProps {
   onAiModifying?: (isModifying: boolean) => void;
   activeTask?: Task;
   onAddMessage?: (message: Omit<Message, 'id'>) => void;
+  onVersionSelect?: (versionId: string) => void;
+  activeVersionId?: string;
 }
 
 const RightPanel: React.FC<RightPanelProps> = ({ 
   isGenerating = false, 
   onAiModifying,
   activeTask,
-  onAddMessage
+  onAddMessage,
+  onVersionSelect,
+  activeVersionId
 }) => {
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -207,25 +211,16 @@ const RightPanel: React.FC<RightPanelProps> = ({
     return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
 
-  const handleRestoreVersion = (version: Version) => {
-    // Indicate that AI is modifying test cases
-    if (onAiModifying) {
-      onAiModifying(true);
-    }
-    
-    // Simulate restoration time
-    setTimeout(() => {
+  const handleVersionSelect = (version: Version) => {
+    if (onVersionSelect) {
+      onVersionSelect(version.id);
+      
       toast({
-        title: `Restored to "${version.name}"`,
-        description: "The test cases have been reverted to this version",
+        title: `Switched to "${version.name}"`,
+        description: "Now viewing this version of test cases",
         duration: 3000,
       });
-      
-      // Notify that AI has finished modifying
-      if (onAiModifying) {
-        onAiModifying(false);
-      }
-    }, 1000);
+    }
   };
 
   return (
@@ -243,8 +238,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
         </TabsList>
         
         <TabsContent value="chat" className="flex-1 flex flex-col p-4 pt-0 h-full">
-          {activeTask ? (
-            <>
+          <>
               <ScrollArea className="flex-1 pr-4 py-4">
                 <div className="space-y-4">
                   {activeTask.messages.map((message) => (
@@ -336,11 +330,6 @@ const RightPanel: React.FC<RightPanelProps> = ({
                 </Button>
               </div>
             </>
-          ) : (
-            <div className="flex-1 flex items-center justify-center text-muted-foreground">
-              Select a task to view chat history
-            </div>
-          )}
         </TabsContent>
         
         <TabsContent value="versions" className="flex-1 flex flex-col p-4 pt-0 h-full">
@@ -350,7 +339,11 @@ const RightPanel: React.FC<RightPanelProps> = ({
                 {versions.map((version, index) => (
                   <Card 
                     key={version.id}
-                    className={`p-3 hover:bg-accent/10 transition-colors cursor-pointer ${index === versions.length - 1 ? 'border-primary/30 bg-primary/5' : ''}`}
+                    className={`p-3 hover:bg-accent/10 transition-colors cursor-pointer ${
+                      version.id === activeVersionId ? 'border-primary border-2 bg-primary/5' : 
+                      index === versions.length - 1 && !activeVersionId ? 'border-primary/30 bg-primary/5' : ''
+                    }`}
+                    onClick={() => handleVersionSelect(version)}
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -359,18 +352,13 @@ const RightPanel: React.FC<RightPanelProps> = ({
                         <p className="text-xs mt-2">{version.changes}</p>
                       </div>
                       <div className="flex space-x-1">
-                        {index === versions.length - 1 && (
-                          <Badge variant="outline" className="text-xs bg-primary/10 border-primary/20">Current</Badge>
-                        )}
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-7 w-7"
-                          onClick={() => handleRestoreVersion(version)}
-                        >
-                          <RotateCcw className="h-3.5 w-3.5" />
-                          <span className="sr-only">Restore</span>
-                        </Button>
+                        {version.id === activeVersionId ? (
+                          <Badge variant="outline" className="text-xs bg-primary/10 border-primary/20">
+                            <Check className="h-3 w-3 mr-1" /> Current
+                          </Badge>
+                        ) : index === versions.length - 1 && !activeVersionId ? (
+                          <Badge variant="outline" className="text-xs bg-primary/10 border-primary/20">Latest</Badge>
+                        ) : null}
                       </div>
                     </div>
                   </Card>

@@ -1,16 +1,20 @@
-
 import React, { useState, useEffect } from "react";
 import TestCase, { TestCaseProps } from "./TestCase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileDown, BarChart2 } from "lucide-react";
+import { FileDown, BarChart2, History } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Task } from "./Workspace";
 import { exportTestCasesToExcel } from "@/utils/excelExport";
 
-// Mock test case data for each task
+// Task test cases for each version
+interface VersionTestCases {
+  [versionId: string]: TestCaseProps[];
+}
+
+// Mock test case data for each task (base versions)
 const taskTestCasesMap: { [key: string]: TestCaseProps[] } = {
   "1": [
     {
@@ -150,16 +154,181 @@ const taskTestCasesMap: { [key: string]: TestCaseProps[] } = {
   ],
 };
 
+// Mock test case data for specific versions
+const taskVersionTestCasesMap: { [key: string]: VersionTestCases } = {
+  "1": {
+    "1-v1": [
+      {
+        id: "1-tc1-v1",
+        title: "Verify User Login with Valid Credentials",
+        preconditions: ["User has registered an account", "User has a valid username and password"],
+        steps: [
+          "Navigate to the login page",
+          "Enter valid username",
+          "Enter valid password",
+          "Click on login button"
+        ],
+        expectedResults: [
+          "User should be logged in successfully",
+          "User should be redirected to the dashboard",
+          "Welcome message should be displayed"
+        ],
+        scenario: "Authentication",
+        priority: "high"
+      },
+      {
+        id: "1-tc2-v1",
+        title: "Check Password Reset Functionality",
+        preconditions: ["User has registered an account"],
+        steps: [
+          "Navigate to the login page",
+          "Click on 'Forgot Password' link",
+          "Enter registered email",
+          "Submit the form"
+        ],
+        expectedResults: [
+          "Password reset email should be sent",
+          "User should receive a confirmation message"
+        ],
+        scenario: "Authentication",
+        priority: "low"
+      },
+    ],
+    "1-v2": [
+      {
+        id: "1-tc1-v2",
+        title: "Verify User Login with Valid Credentials",
+        preconditions: ["User has registered an account", "User has a valid username and password"],
+        steps: [
+          "Navigate to the login page",
+          "Enter valid username",
+          "Enter valid password",
+          "Click on login button"
+        ],
+        expectedResults: [
+          "User should be logged in successfully",
+          "User should be redirected to the dashboard",
+          "Welcome message should be displayed"
+        ],
+        scenario: "Authentication",
+        priority: "high"
+      },
+      {
+        id: "1-tc2-v2",
+        title: "Check Password Reset Functionality",
+        preconditions: ["User has registered an account"],
+        steps: [
+          "Navigate to the login page",
+          "Click on 'Forgot Password' link",
+          "Enter registered email",
+          "Submit the form",
+          "Check email for reset link",
+          "Click on the reset link",
+          "Enter new password",
+          "Confirm new password",
+          "Submit the form"
+        ],
+        expectedResults: [
+          "Password reset email should be sent",
+          "User should be able to reset password",
+          "User should be able to login with new password"
+        ],
+        scenario: "Authentication",
+        priority: "medium"
+      },
+      {
+        id: "1-tc3-v2",
+        title: "Validate User Registration Form",
+        preconditions: ["Registration page is accessible"],
+        steps: [
+          "Navigate to registration page",
+          "Enter invalid email format",
+          "Enter password less than 8 characters",
+          "Submit the form"
+        ],
+        expectedResults: [
+          "Form submission should fail",
+          "Error message for invalid email should be displayed",
+          "Error message for password length should be displayed"
+        ],
+        scenario: "Registration",
+        priority: "medium"
+      },
+    ]
+  },
+  "2": {
+    "2-v1": [
+      {
+        id: "2-tc1-v1",
+        title: "Verify Credit Card Payment",
+        preconditions: ["User is logged in", "User has items in cart"],
+        steps: [
+          "Navigate to checkout page",
+          "Select credit card payment method",
+          "Enter valid credit card details",
+          "Submit payment"
+        ],
+        expectedResults: [
+          "Payment should be processed successfully",
+          "Order confirmation page should be displayed"
+        ],
+        scenario: "Payment",
+        priority: "high"
+      },
+    ],
+    "2-v2": [
+      {
+        id: "2-tc1-v2",
+        title: "Verify Credit Card Payment",
+        preconditions: ["User is logged in", "User has items in cart"],
+        steps: [
+          "Navigate to checkout page",
+          "Select credit card payment method",
+          "Enter valid credit card details",
+          "Submit payment"
+        ],
+        expectedResults: [
+          "Payment should be processed successfully",
+          "Order confirmation page should be displayed",
+          "Confirmation email should be sent to the user"
+        ],
+        scenario: "Payment",
+        priority: "high"
+      },
+      {
+        id: "2-tc2-v2",
+        title: "Handle Payment Failure",
+        preconditions: ["User is logged in", "User has items in cart"],
+        steps: [
+          "Navigate to checkout page",
+          "Select credit card payment method",
+          "Enter invalid credit card details",
+          "Submit payment"
+        ],
+        expectedResults: [
+          "Payment should fail",
+          "Error message should be displayed",
+          "User should be able to retry payment"
+        ],
+        scenario: "Payment",
+        priority: "high"
+      },
+    ]
+  }
+};
+
 interface CenterPanelProps {
   isGenerating?: boolean;
   isAiModifying?: boolean;
   activeTask?: Task;
+  activeVersionId?: string;
 }
 
 const CenterPanel: React.FC<CenterPanelProps> = ({ 
   isGenerating = false, 
   isAiModifying = false,
-  activeTask
+  activeTask,
+  activeVersionId
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [priority, setPriority] = useState<string>("all");
@@ -174,6 +343,7 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
           if (prev >= 100) {
             clearInterval(interval);
             if (activeTask) {
+              // Load the most recent test cases when generating or modifying
               setTestCases(taskTestCasesMap[activeTask.id] || []);
             }
             return 100;
@@ -185,13 +355,22 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
       return () => clearInterval(interval);
     } else {
       if (activeTask) {
-        setTestCases(taskTestCasesMap[activeTask.id] || []);
+        if (activeVersionId) {
+          // If a version is selected, use the test cases for that version
+          const versionTestCases = 
+            taskVersionTestCasesMap[activeTask.id]?.[activeVersionId] || 
+            taskTestCasesMap[activeTask.id] || [];
+          setTestCases(versionTestCases);
+        } else {
+          // Otherwise, use the most recent test cases
+          setTestCases(taskTestCasesMap[activeTask.id] || []);
+        }
       } else {
         setTestCases([]);
       }
       setProgress(100);
     }
-  }, [isGenerating, isAiModifying, activeTask]);
+  }, [isGenerating, isAiModifying, activeTask, activeVersionId]);
 
   const filteredTestCases = testCases.filter((testCase) => {
     const matchesSearch = searchTerm === "" || 
@@ -206,7 +385,8 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
   const handleExport = () => {
     if (filteredTestCases.length === 0) return;
     
-    const filename = `test-cases-${activeTask?.title || 'all'}-${new Date().toISOString().split('T')[0]}.xlsx`;
+    const versionSuffix = activeVersionId ? `-${activeVersionId}` : '';
+    const filename = `test-cases-${activeTask?.title || 'all'}${versionSuffix}-${new Date().toISOString().split('T')[0]}.xlsx`;
     exportTestCasesToExcel(filteredTestCases, filename);
   };
   
@@ -214,7 +394,17 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
     <div className="panel-transition w-full h-full p-4 flex flex-col white-panel">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-medium">
-          {activeTask ? `Test Cases: ${activeTask.title}` : 'Test Cases'}
+          {activeTask ? (
+            <div className="flex items-center">
+              <span>{`Test Cases: ${activeTask.title}`}</span>
+              {activeVersionId && (
+                <Badge variant="outline" className="ml-2 bg-primary/5 border-primary/20">
+                  <History className="h-3 w-3 mr-1" />
+                  Version: {activeVersionId.split('-v')[1] || activeVersionId}
+                </Badge>
+              )}
+            </div>
+          ) : 'Test Cases'}
         </h2>
         <div className="flex space-x-2">
           <Button 
@@ -265,6 +455,20 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
               </SelectContent>
             </Select>
           </div>
+          
+          {activeVersionId && (
+            <div className="rounded-md border bg-primary/5 px-4 py-2 mb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <History className="h-4 w-4 text-primary" />
+                  <span className="text-sm text-primary">Viewing Historical Version</span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Version ID: {activeVersionId}
+                </div>
+              </div>
+            </div>
+          )}
           
           <div className="rounded-md border bg-muted/10 px-4 py-2 mb-4">
             <div className="flex items-center justify-between">

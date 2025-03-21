@@ -107,6 +107,7 @@ const Workspace: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isAiModifying, setIsAiModifying] = useState(false);
   const [activeTask, setActiveTask] = useState<Task | undefined>(undefined);
+  const [activeVersionId, setActiveVersionId] = useState<string | undefined>(undefined);
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
 
   useEffect(() => {
@@ -115,6 +116,11 @@ const Workspace: React.FC = () => {
       setActiveTask(tasks[0]);
     }
   }, [tasks, activeTask]);
+
+  // Reset activeVersionId when changing tasks
+  useEffect(() => {
+    setActiveVersionId(undefined);
+  }, [activeTask]);
 
   const handleGenerate = () => {
     setIsGenerating(true);
@@ -128,17 +134,22 @@ const Workspace: React.FC = () => {
     }, 2000);
   };
 
-  const handleAiAction = () => {
-    setIsAiModifying(true);
-    // Simulate AI modification delay
-    setTimeout(() => {
-      setIsAiModifying(false);
-    }, 1500);
+  const handleAiAction = (isModifying: boolean) => {
+    setIsAiModifying(isModifying);
+    // Reset version when AI is modifying
+    if (isModifying) {
+      setActiveVersionId(undefined);
+    }
   };
 
   const handleTaskSelect = (taskId: string) => {
     const selectedTask = tasks.find(task => task.id === taskId);
     setActiveTask(selectedTask);
+    setActiveVersionId(undefined); // Reset version when changing tasks
+  };
+
+  const handleVersionSelect = (versionId: string) => {
+    setActiveVersionId(versionId === activeVersionId ? undefined : versionId);
   };
 
   const handleAddMessage = (message: Omit<Message, 'id'>) => {
@@ -184,6 +195,7 @@ const Workspace: React.FC = () => {
           isGenerating={isGenerating} 
           isAiModifying={isAiModifying} 
           activeTask={activeTask}
+          activeVersionId={activeVersionId}
         />
       </div>
       <div className="w-1/4 min-w-[300px] max-w-[400px]">
@@ -192,6 +204,8 @@ const Workspace: React.FC = () => {
           onAiModifying={handleAiAction}
           activeTask={activeTask}
           onAddMessage={handleAddMessage}
+          onVersionSelect={handleVersionSelect}
+          activeVersionId={activeVersionId}
         />
       </div>
     </div>
