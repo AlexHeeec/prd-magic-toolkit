@@ -168,7 +168,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
 
   return (
     <div className="panel-transition w-full h-full flex flex-col bg-white rounded-xl border border-primary/20 shadow-sm overflow-hidden">
-      <Tabs defaultValue="chat" className="w-full h-full flex flex-col">
+      <Tabs defaultValue="chat" className="w-full flex flex-col">
         <TabsList className="grid grid-cols-2 m-4 mb-0">
           <TabsTrigger value="chat" className="flex items-center gap-1">
             <MessageCircle className="h-4 w-4" />
@@ -179,145 +179,145 @@ const RightPanel: React.FC<RightPanelProps> = ({
             <span>Versions</span>
           </TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="chat" className="flex-1 flex flex-col p-4 pt-0 h-full overflow-hidden">
-          {activeTask ? (
-            <>
-              <div className="flex-1 overflow-hidden">
-                <ScrollArea className="h-full pr-4 py-4">
-                  <div className="space-y-4">
-                    {activeTask.messages.map((message) => (
-                      <div 
-                        key={message.id} 
-                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div className={`flex max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                          <div className={`flex-shrink-0 ${message.sender === 'user' ? 'ml-2' : 'mr-2'}`}>
-                            {message.sender === 'ai' ? (
+        {/* 让 TabsContent 区域占据剩余空间 */}
+        <div className="flex-1">
+          <TabsContent value="chat" className="flex flex-col h-full p-4 pt-0 overflow-hidden">
+            {activeTask ? (
+              <>
+                <div className="flex-1 overflow-hidden">
+                  <ScrollArea className="h-full pr-4 py-4">
+                    <div className="space-y-4">
+                      {activeTask.messages.map((message) => (
+                        <div 
+                          key={message.id} 
+                          className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div className={`flex max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                            <div className={`flex-shrink-0 ${message.sender === 'user' ? 'ml-2' : 'mr-2'}`}>
+                              {message.sender === 'ai' ? (
+                                <Avatar className="h-8 w-8">
+                                  <AvatarFallback className="bg-primary/10 text-primary">
+                                    <Bot className="h-4 w-4" />
+                                  </AvatarFallback>
+                                </Avatar>
+                              ) : (
+                                <Avatar className="h-8 w-8">
+                                  <AvatarFallback className="bg-secondary/50">
+                                    <User className="h-4 w-4" />
+                                  </AvatarFallback>
+                                </Avatar>
+                              )}
+                            </div>
+                            <div 
+                              className={`rounded-lg p-3 text-sm ${
+                                message.sender === 'user' 
+                                  ? 'bg-primary text-primary-foreground' 
+                                  : 'bg-accent/50'
+                              }`}
+                            >
+                              {message.content}
+                              <div 
+                                className={`text-xs mt-1 ${
+                                  message.sender === 'user' 
+                                    ? 'text-primary-foreground/70' 
+                                    : 'text-muted-foreground'
+                                }`}
+                              >
+                                {formatTime(message.timestamp)}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      {isTyping && (
+                        <div className="flex justify-start">
+                          <div className="flex flex-row">
+                            <div className="flex-shrink-0 mr-2">
                               <Avatar className="h-8 w-8">
                                 <AvatarFallback className="bg-primary/10 text-primary">
                                   <Bot className="h-4 w-4" />
                                 </AvatarFallback>
                               </Avatar>
-                            ) : (
-                              <Avatar className="h-8 w-8">
-                                <AvatarFallback className="bg-secondary/50">
-                                  <User className="h-4 w-4" />
-                                </AvatarFallback>
-                              </Avatar>
-                            )}
-                          </div>
-                          <div 
-                            className={`rounded-lg p-3 text-sm ${
-                              message.sender === 'user' 
-                                ? 'bg-primary text-primary-foreground' 
-                                : 'bg-accent/50'
-                            }`}
-                          >
-                            {message.content}
-                            <div 
-                              className={`text-xs mt-1 ${
-                                message.sender === 'user' 
-                                  ? 'text-primary-foreground/70' 
-                                  : 'text-muted-foreground'
-                              }`}
-                            >
-                              {formatTime(message.timestamp)}
+                            </div>
+                            <div className="rounded-lg p-3 bg-accent/50">
+                              <div className="flex space-x-1">
+                                <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse"></div>
+                                <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                                <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                    {isTyping && (
-                      <div className="flex justify-start">
-                        <div className="flex flex-row">
-                          <div className="flex-shrink-0 mr-2">
-                            <Avatar className="h-8 w-8">
-                              <AvatarFallback className="bg-primary/10 text-primary">
-                                <Bot className="h-4 w-4" />
-                              </AvatarFallback>
-                            </Avatar>
-                          </div>
-                          <div className="rounded-lg p-3 bg-accent/50">
-                            <div className="flex space-x-1">
-                              <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse"></div>
-                              <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                              <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <div ref={messagesEndRef} />
-                  </div>
-                </ScrollArea>
-              </div>
-              
-              <div className="pt-3 relative flex-shrink-0">
-                <Textarea
-                  placeholder="Ask AI to modify test cases..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="min-h-[80px] pr-10 resize-none"
-                />
-                <Button
-                  size="icon"
-                  className="absolute right-2 bottom-2"
-                  onClick={handleSendMessage}
-                  disabled={newMessage.trim() === "" || isTyping}
-                >
-                  {isTyping ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
-                  <span className="sr-only">Send</span>
-                </Button>
-              </div>
-            </>
-          ) : (
-            <div className="flex-1 flex items-center justify-center text-muted-foreground">
-              Select a task to view chat history
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="versions" className="flex-1 flex flex-col p-4 pt-0 h-full overflow-hidden">
-          {activeTask ? (
-            <ScrollArea className="h-full pr-4 py-4" ref={versionsScrollRef}>
-              <div className="space-y-3">
-                {versions.map((version) => (
-                  <Card 
-                    key={version.id}
-                    className={`p-3 hover:bg-accent/10 transition-colors cursor-pointer ${version.id === activeVersionId ? 'border-primary/30 bg-primary/5' : ''}`}
-                    onClick={() => handleVersionClick(version.id)}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-sm font-medium">{version.name}</h3>
-                        <p className="text-xs text-muted-foreground mt-1">{formatDate(version.timestamp)} at {formatTime(version.timestamp)}</p>
-                        <p className="text-xs mt-2">{version.changes}</p>
-                      </div>
-                      <div className="flex space-x-1">
-                        {version.id === activeVersionId && (
-                          <Badge variant="outline" className="text-xs bg-primary/10 border-primary/20">Current</Badge>
-                        )}
-                      </div>
+                      )}
+                      <div ref={messagesEndRef} />
                     </div>
-                  </Card>
-                ))}
+                  </ScrollArea>
+                </div>
+                <div className="pt-3 relative flex-shrink-0">
+                  <Textarea
+                    placeholder="Ask AI to modify test cases..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="min-h-[80px] pr-10 resize-none"
+                  />
+                  <Button
+                    size="icon"
+                    className="absolute right-2 bottom-2"
+                    onClick={handleSendMessage}
+                    disabled={newMessage.trim() === "" || isTyping}
+                  >
+                    {isTyping ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">Send</span>
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-1 items-center justify-center text-muted-foreground">
+                Select a task to view chat history
               </div>
-            </ScrollArea>
-          ) : (
-            <div className="flex-1 flex items-center justify-center text-muted-foreground">
-              Select a task to view versions
-            </div>
-          )}
-        </TabsContent>
+            )}
+          </TabsContent>
+          <TabsContent value="versions" className="flex flex-col h-full p-4 pt-0 overflow-hidden">
+            {activeTask ? (
+              <ScrollArea className="h-full pr-4 py-4" ref={versionsScrollRef}>
+                <div className="space-y-3">
+                  {versions.map((version) => (
+                    <Card 
+                      key={version.id}
+                      className={`p-3 hover:bg-accent/10 transition-colors cursor-pointer ${version.id === activeVersionId ? 'border-primary/30 bg-primary/5' : ''}`}
+                      onClick={() => handleVersionClick(version.id)}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-sm font-medium">{version.name}</h3>
+                          <p className="text-xs text-muted-foreground mt-1">{formatDate(version.timestamp)} at {formatTime(version.timestamp)}</p>
+                          <p className="text-xs mt-2">{version.changes}</p>
+                        </div>
+                        <div className="flex space-x-1">
+                          {version.id === activeVersionId && (
+                            <Badge variant="outline" className="text-xs bg-primary/10 border-primary/20">Current</Badge>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </ScrollArea>
+            ) : (
+              <div className="flex flex-1 items-center justify-center text-muted-foreground">
+                Select a task to view versions
+              </div>
+            )}
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   );
 };
 
-export default RightPanel;
+export default RightPanel;    
