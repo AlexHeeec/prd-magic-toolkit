@@ -1,7 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ScrollArea, Tabs, TabsList, TabsTrigger, TabsContent, Textarea, Button, Avatar, AvatarFallback, Badge, Card } from '@your-ui-library'; // 请替换为实际的UI库
-import { MessageCircle, History, Bot, User, Send, Loader2 } from '@your-icon-library'; // 请替换为实际的图标库
-import { useToast } from '@your-toast-library'; // 请替换为实际的Toast库
+import React, { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { MessageCircle, History, Send, Bot, User, Trash, Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { Task, Message, Version } from "./Workspace";
+
+// Sample AI responses based on user input
+const getAIResponse = (userInput: string): string => {
+  const input = userInput.toLowerCase();
+  
+  if (input.includes("add") && (input.includes("test") || input.includes("case"))) {
+    return "I've added new test cases based on your request. You can see them in the test case panel.";
+  } else if (input.includes("delete") || input.includes("remove")) {
+    return "I've removed the specified test cases from the list. Is there anything else you'd like me to modify?";
+  } else if (input.includes("modify") || input.includes("update") || input.includes("change")) {
+    return "I've updated the test cases according to your specifications. The changes are now reflected in the test case panel.";
+  } else if (input.includes("priority")) {
+    return "I've adjusted the priority levels for the test cases you mentioned. You can filter by priority to see the changes.";
+  } else {
+    return "I understand your request. I'll analyze and process it to modify the test cases accordingly. Is there anything specific you'd like me to focus on?";
+  }
+};
 
 interface RightPanelProps {
   isGenerating?: boolean;
@@ -11,28 +35,6 @@ interface RightPanelProps {
   versions?: Version[];
   activeVersionId?: string;
   onVersionSelect?: (versionId: string) => void;
-}
-
-interface Task {
-  id: string;
-  title: string;
-  date: string;
-  caseCount: number;
-  messages: Message[];
-}
-
-interface Message {
-  id: string;
-  content: string;
-  sender: "user" | "ai";
-  timestamp: Date;
-}
-
-interface Version {
-  id: string;
-  name: string;
-  timestamp: Date;
-  changes: string;
 }
 
 const RightPanel: React.FC<RightPanelProps> = ({ 
@@ -175,7 +177,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
           {activeTask ? (
             <>
               <div className="flex-1 overflow-hidden">
-                {/* 调整滚动区域的高度 */}
+                {/* 修改这里的 ScrollArea 高度 */}
                 <ScrollArea className="h-full pr-4 py-4">
                   <div className="space-y-4">
                     {activeTask.messages.map((message) => (
@@ -277,7 +279,8 @@ const RightPanel: React.FC<RightPanelProps> = ({
         
         <TabsContent value="versions" className="flex-1 flex flex-col p-4 pt-0 h-full overflow-hidden">
           {activeTask ? (
-            <ScrollArea className="h-[calc(100vh-200px)] pr-4 py-4">
+            {/* 这里也可以根据需要修改 ScrollArea 高度 */}
+            <ScrollArea className="h-full pr-4 py-4">
               <div className="space-y-3">
                 {versions.map((version) => (
                   <Card 
@@ -310,23 +313,6 @@ const RightPanel: React.FC<RightPanelProps> = ({
       </Tabs>
     </div>
   );
-};
-
-// Sample AI responses based on user input
-const getAIResponse = (userInput: string): string => {
-  const input = userInput.toLowerCase();
-  
-  if (input.includes("add") && (input.includes("test") || input.includes("case"))) {
-    return "I've added new test cases based on your request. You can see them in the test case panel.";
-  } else if (input.includes("delete") || input.includes("remove")) {
-    return "I've removed the specified test cases from the list. Is there anything else you'd like me to modify?";
-  } else if (input.includes("modify") || input.includes("update") || input.includes("change")) {
-    return "I've updated the test cases according to your specifications. The changes are now reflected in the test case panel.";
-  } else if (input.includes("priority")) {
-    return "I've adjusted the priority levels for the test cases you mentioned. You can filter by priority to see the changes.";
-  } else {
-    return "I understand your request. I'll analyze and process it to modify the test cases accordingly. Is there anything specific you'd like me to focus on?";
-  }
 };
 
 export default RightPanel;
