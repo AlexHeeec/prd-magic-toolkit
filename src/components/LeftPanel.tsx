@@ -68,9 +68,9 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   const hasContent = prdInput.length > 0 || selectedFile !== null;
 
   return (
-    <div className="panel-transition w-full h-full p-4 flex flex-col bg-white rounded-xl border border-primary/20 overflow-hidden">
+  //  <div className="panel-transition w-full h-full p-4 flex flex-col bg-white rounded-xl border border-primary/20 overflow-hidden">
+    <div className="panel-transition w-full h-full flex flex-col bg-white rounded-xl border border-primary/20 shadow-sm overflow-hidden">
       <h2 className="text-lg font-medium mb-4">Test Case Generation</h2>
-      
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-2 mb-4">
           <TabsTrigger value="input" className="flex items-center gap-1">
