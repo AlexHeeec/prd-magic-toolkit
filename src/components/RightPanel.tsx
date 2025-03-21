@@ -175,8 +175,8 @@ const RightPanel: React.FC<RightPanelProps> = ({
         
         <TabsContent value="chat" className="flex-1 flex flex-col p-4 pt-0 h-full overflow-hidden">
           {activeTask ? (
-            <>
-              {/* 设置聊天内容区域的固定高度 */}
+            <div className="flex flex-col h-full">
+              {/* 聊天消息显示区域 */}
               <div className="flex-1 overflow-y-auto h-[calc(100vh-200px)] pr-4 py-4"> 
                 <div className="space-y-4">
                   {activeTask.messages.map((message) => (
@@ -245,7 +245,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
                 </div>
               </div>
               
-              {/* 固定发送消息的输入框和按钮在底部 */}
+              {/* 输入发送区域 */}
               <div className="pt-3 relative flex-shrink-0"> 
                 <Textarea
                   placeholder="Ask AI to modify test cases..."
@@ -268,7 +268,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
                   <span className="sr-only">Send</span>
                 </Button>
               </div>
-            </>
+            </div>
           ) : (
             <div className="flex-1 flex items-center justify-center text-muted-foreground">
               Select a task to view chat history
@@ -313,4 +313,4 @@ const RightPanel: React.FC<RightPanelProps> = ({
   );
 };
 
-export default RightPanel;
+export default RightPanel;    
