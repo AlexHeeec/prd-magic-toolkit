@@ -249,8 +249,8 @@ const Workspace: React.FC = () => {
   };
 
   return (
-    <div className="flex h-full w-full gap-4 p-4">
-      <div className="w-1/4 min-w-[300px] max-w-[400px]">
+    <div className="flex h-screen w-full gap-4 p-4 overflow-hidden">
+      <div className="w-1/4 min-w-[300px] max-w-[400px] h-full overflow-hidden">
         <LeftPanel 
           onGenerate={handleGenerate} 
           tasks={tasks}
@@ -258,7 +258,7 @@ const Workspace: React.FC = () => {
           onTaskSelect={handleTaskSelect}
         />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 h-full overflow-hidden">
         <CenterPanel 
           isGenerating={isGenerating} 
           isAiModifying={isAiModifying} 
@@ -266,7 +266,7 @@ const Workspace: React.FC = () => {
           activeVersionId={activeVersionId}
         />
       </div>
-      <div className="w-1/4 min-w-[300px] max-w-[400px]">
+      <div className="w-1/4 min-w-[300px] max-w-[400px] h-full overflow-hidden">
         <RightPanel 
           isGenerating={isGenerating}
           onAiModifying={handleAiAction}

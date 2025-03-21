@@ -296,7 +296,7 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
   }, [activeTask, activeVersionId]);
 
   return (
-    <div className="panel-transition w-full h-full p-4 flex flex-col white-panel">
+    <div className="panel-transition w-full h-full p-4 flex flex-col white-panel overflow-hidden">
       <div className="flex items-center justify-between mb-4">
         <div className="flex flex-col">
           <h2 className="text-lg font-medium">
@@ -382,13 +382,15 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
           </div>
           
           {filteredTestCases.length > 0 ? (
-            <ScrollArea className="flex-1 pr-4">
-              <div className="space-y-3 pb-4">
-                {filteredTestCases.map((testCase) => (
-                  <TestCase key={testCase.id} {...testCase} />
-                ))}
-              </div>
-            </ScrollArea>
+            <div className="flex-1 overflow-hidden">
+              <ScrollArea className="h-[calc(100vh-280px)]">
+                <div className="space-y-3 pb-4 pr-4">
+                  {filteredTestCases.map((testCase) => (
+                    <TestCase key={testCase.id} {...testCase} />
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-8">
               <p className="text-muted-foreground">

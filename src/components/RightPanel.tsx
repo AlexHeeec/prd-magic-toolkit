@@ -161,7 +161,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
   };
 
   return (
-    <div className="panel-transition w-full h-full flex flex-col bg-white rounded-xl border border-primary/20 shadow-sm">
+    <div className="panel-transition w-full h-full flex flex-col bg-white rounded-xl border border-primary/20 shadow-sm overflow-hidden">
       <Tabs defaultValue="chat" className="w-full h-full flex flex-col">
         <TabsList className="grid grid-cols-2 m-4 mb-0">
           <TabsTrigger value="chat" className="flex items-center gap-1">
@@ -174,76 +174,78 @@ const RightPanel: React.FC<RightPanelProps> = ({
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="chat" className="flex-1 flex flex-col p-4 pt-0 h-full">
+        <TabsContent value="chat" className="flex-1 flex flex-col p-4 pt-0 h-full overflow-hidden">
           {activeTask ? (
             <>
-              <ScrollArea className="flex-1 pr-4 py-4">
-                <div className="space-y-4">
-                  {activeTask.messages.map((message) => (
-                    <div 
-                      key={message.id} 
-                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div className={`flex max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                        <div className={`flex-shrink-0 ${message.sender === 'user' ? 'ml-2' : 'mr-2'}`}>
-                          {message.sender === 'ai' ? (
+              <div className="flex-1 overflow-hidden">
+                <ScrollArea className="h-[calc(100vh-240px)] pr-4 py-4">
+                  <div className="space-y-4">
+                    {activeTask.messages.map((message) => (
+                      <div 
+                        key={message.id} 
+                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div className={`flex max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                          <div className={`flex-shrink-0 ${message.sender === 'user' ? 'ml-2' : 'mr-2'}`}>
+                            {message.sender === 'ai' ? (
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-primary/10 text-primary">
+                                  <Bot className="h-4 w-4" />
+                                </AvatarFallback>
+                              </Avatar>
+                            ) : (
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-secondary/50">
+                                  <User className="h-4 w-4" />
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
+                          </div>
+                          <div 
+                            className={`rounded-lg p-3 text-sm ${
+                              message.sender === 'user' 
+                                ? 'bg-primary text-primary-foreground' 
+                                : 'bg-accent/50'
+                            }`}
+                          >
+                            {message.content}
+                            <div 
+                              className={`text-xs mt-1 ${
+                                message.sender === 'user' 
+                                  ? 'text-primary-foreground/70' 
+                                  : 'text-muted-foreground'
+                              }`}
+                            >
+                              {formatTime(message.timestamp)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {isTyping && (
+                      <div className="flex justify-start">
+                        <div className="flex flex-row">
+                          <div className="flex-shrink-0 mr-2">
                             <Avatar className="h-8 w-8">
                               <AvatarFallback className="bg-primary/10 text-primary">
                                 <Bot className="h-4 w-4" />
                               </AvatarFallback>
                             </Avatar>
-                          ) : (
-                            <Avatar className="h-8 w-8">
-                              <AvatarFallback className="bg-secondary/50">
-                                <User className="h-4 w-4" />
-                              </AvatarFallback>
-                            </Avatar>
-                          )}
-                        </div>
-                        <div 
-                          className={`rounded-lg p-3 text-sm ${
-                            message.sender === 'user' 
-                              ? 'bg-primary text-primary-foreground' 
-                              : 'bg-accent/50'
-                          }`}
-                        >
-                          {message.content}
-                          <div 
-                            className={`text-xs mt-1 ${
-                              message.sender === 'user' 
-                                ? 'text-primary-foreground/70' 
-                                : 'text-muted-foreground'
-                            }`}
-                          >
-                            {formatTime(message.timestamp)}
+                          </div>
+                          <div className="rounded-lg p-3 bg-accent/50">
+                            <div className="flex space-x-1">
+                              <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse"></div>
+                              <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                              <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                  {isTyping && (
-                    <div className="flex justify-start">
-                      <div className="flex flex-row">
-                        <div className="flex-shrink-0 mr-2">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback className="bg-primary/10 text-primary">
-                              <Bot className="h-4 w-4" />
-                            </AvatarFallback>
-                          </Avatar>
-                        </div>
-                        <div className="rounded-lg p-3 bg-accent/50">
-                          <div className="flex space-x-1">
-                            <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse"></div>
-                            <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                            <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-              </ScrollArea>
+                    )}
+                    <div ref={messagesEndRef} />
+                  </div>
+                </ScrollArea>
+              </div>
               
               <div className="pt-3 relative">
                 <Textarea
@@ -275,9 +277,9 @@ const RightPanel: React.FC<RightPanelProps> = ({
           )}
         </TabsContent>
         
-        <TabsContent value="versions" className="flex-1 flex flex-col p-4 pt-0 h-full">
+        <TabsContent value="versions" className="flex-1 flex flex-col p-4 pt-0 h-full overflow-hidden">
           {activeTask ? (
-            <ScrollArea className="flex-1 pr-4 py-4">
+            <ScrollArea className="h-[calc(100vh-200px)] pr-4 py-4">
               <div className="space-y-3">
                 {versions.map((version) => (
                   <Card 
