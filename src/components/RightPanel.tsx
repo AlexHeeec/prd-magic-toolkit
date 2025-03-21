@@ -277,7 +277,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
 
         <TabsContent value="versions" className="flex-1 flex flex-col p-4 pt-0 h-full overflow-hidden">
           {activeTask ? (
-            <ScrollArea className="h-[calc(100vh-200px)] pr-4 py-4">
+            <ScrollArea className="h-[calc(100vh-400px)] pr-4 py-4">
               <div className="space-y-3">
                 {versions.map((version) => (
                   <Card
