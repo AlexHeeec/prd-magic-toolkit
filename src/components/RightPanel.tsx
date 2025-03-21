@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,63 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, History, Send, Bot, User, Trash, RotateCcw, Loader2 } from "lucide-react";
+import { MessageCircle, History, Send, Bot, User, Trash, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { Task, Message } from "./Workspace";
-
-interface Version {
-  id: string;
-  name: string;
-  timestamp: Date;
-  changes: string;
-}
-// Mock versions data for each task
-const taskVersionsMap: { [key: string]: Version[] } = {
-  "1": [
-    {
-      id: "1-v1",
-      name: "Initial Version",
-      timestamp: new Date(Date.now() - 3600000),
-      changes: "Generated 12 test cases for authentication flow"
-    },
-    {
-      id: "1-v2",
-      name: "Added Registration Tests",
-      timestamp: new Date(Date.now() - 2400000),
-      changes: "Added 3 test cases for user registration"
-    }
-  ],
-  "2": [
-    {
-      id: "2-v1",
-      name: "Initial Version",
-      timestamp: new Date(Date.now() - 4800000),
-      changes: "Generated 15 test cases for payment processing"
-    },
-    {
-      id: "2-v2",
-      name: "Added Payment Failure Tests",
-      timestamp: new Date(Date.now() - 3600000),
-      changes: "Added 3 test cases for payment failures"
-    }
-  ],
-  "3": [
-    {
-      id: "3-v1",
-      name: "Initial Version",
-      timestamp: new Date(Date.now() - 5600000),
-      changes: "Generated 15 test cases for profile management"
-    }
-  ],
-  "4": [
-    {
-      id: "4-v1",
-      name: "Initial Version",
-      timestamp: new Date(Date.now() - 6000000),
-      changes: "Generated 8 test cases for dashboard analytics"
-    }
-  ]
-};
+import { Task, Message, Version } from "./Workspace";
 
 // Sample AI responses based on user input
 const getAIResponse = (userInput: string): string => {
@@ -86,28 +33,24 @@ interface RightPanelProps {
   onAiModifying?: (isModifying: boolean) => void;
   activeTask?: Task;
   onAddMessage?: (message: Omit<Message, 'id'>) => void;
+  versions?: Version[];
+  activeVersionId?: string;
+  onVersionSelect?: (versionId: string) => void;
 }
 
 const RightPanel: React.FC<RightPanelProps> = ({ 
   isGenerating = false, 
   onAiModifying,
   activeTask,
-  onAddMessage
+  onAddMessage,
+  versions = [],
+  activeVersionId,
+  onVersionSelect
 }) => {
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [versions, setVersions] = useState<Version[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-
-  // Update versions when activeTask changes
-  useEffect(() => {
-    if (activeTask) {
-      setVersions(taskVersionsMap[activeTask.id] || []);
-    } else {
-      setVersions([]);
-    }
-  }, [activeTask]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -169,14 +112,18 @@ const RightPanel: React.FC<RightPanelProps> = ({
       
       // Add a new version if the message suggests modifications were made
       if (userMessage.content.toLowerCase().match(/add|delete|remove|modify|update|change|priority/)) {
+        const newVersionId = `${activeTask.id}-v${versions.length + 1}`;
         const newVersion: Version = {
-          id: `${activeTask.id}-v${versions.length + 1}`,
+          id: newVersionId,
           name: `Updated based on user feedback`,
           timestamp: new Date(),
           changes: `Modified test cases based on: "${userMessage.content.substring(0, 40)}${userMessage.content.length > 40 ? '...' : ''}"`
         };
         
-        setVersions((prev) => [...prev, newVersion]);
+        // Select the new version if onVersionSelect is provided
+        if (onVersionSelect) {
+          onVersionSelect(newVersionId);
+        }
         
         toast({
           title: "Test cases updated",
@@ -207,25 +154,10 @@ const RightPanel: React.FC<RightPanelProps> = ({
     return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
 
-  const handleRestoreVersion = (version: Version) => {
-    // Indicate that AI is modifying test cases
-    if (onAiModifying) {
-      onAiModifying(true);
+  const handleVersionClick = (versionId: string) => {
+    if (onVersionSelect) {
+      onVersionSelect(versionId);
     }
-    
-    // Simulate restoration time
-    setTimeout(() => {
-      toast({
-        title: `Restored to "${version.name}"`,
-        description: "The test cases have been reverted to this version",
-        duration: 3000,
-      });
-      
-      // Notify that AI has finished modifying
-      if (onAiModifying) {
-        onAiModifying(false);
-      }
-    }, 1000);
   };
 
   return (
@@ -347,10 +279,11 @@ const RightPanel: React.FC<RightPanelProps> = ({
           {activeTask ? (
             <ScrollArea className="flex-1 pr-4 py-4">
               <div className="space-y-3">
-                {versions.map((version, index) => (
+                {versions.map((version) => (
                   <Card 
                     key={version.id}
-                    className={`p-3 hover:bg-accent/10 transition-colors cursor-pointer ${index === versions.length - 1 ? 'border-primary/30 bg-primary/5' : ''}`}
+                    className={`p-3 hover:bg-accent/10 transition-colors cursor-pointer ${version.id === activeVersionId ? 'border-primary/30 bg-primary/5' : ''}`}
+                    onClick={() => handleVersionClick(version.id)}
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -359,18 +292,9 @@ const RightPanel: React.FC<RightPanelProps> = ({
                         <p className="text-xs mt-2">{version.changes}</p>
                       </div>
                       <div className="flex space-x-1">
-                        {index === versions.length - 1 && (
+                        {version.id === activeVersionId && (
                           <Badge variant="outline" className="text-xs bg-primary/10 border-primary/20">Current</Badge>
                         )}
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-7 w-7"
-                          onClick={() => handleRestoreVersion(version)}
-                        >
-                          <RotateCcw className="h-3.5 w-3.5" />
-                          <span className="sr-only">Restore</span>
-                        </Button>
                       </div>
                     </div>
                   </Card>

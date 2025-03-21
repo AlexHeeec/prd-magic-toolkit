@@ -5,14 +5,59 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileDown, BarChart2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { FileDown, BarChart2, History } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { Task } from "./Workspace";
+import { Task, Version } from "./Workspace";
 import { exportTestCasesToExcel } from "@/utils/excelExport";
 
-// Mock test case data for each task
-const taskTestCasesMap: { [key: string]: TestCaseProps[] } = {
-  "1": [
+// Mock test case data for each task and version
+const testCasesMap: { [key: string]: TestCaseProps[] } = {
+  // Task 1 versions
+  "1-v1": [
+    {
+      id: "1-tc1",
+      title: "Verify User Login with Valid Credentials",
+      preconditions: ["User has registered an account", "User has a valid username and password"],
+      steps: [
+        "Navigate to the login page",
+        "Enter valid username",
+        "Enter valid password",
+        "Click on login button"
+      ],
+      expectedResults: [
+        "User should be logged in successfully",
+        "User should be redirected to the dashboard",
+        "Welcome message should be displayed"
+      ],
+      scenario: "Authentication",
+      priority: "high"
+    },
+    {
+      id: "1-tc2",
+      title: "Check Password Reset Functionality",
+      preconditions: ["User has registered an account"],
+      steps: [
+        "Navigate to the login page",
+        "Click on 'Forgot Password' link",
+        "Enter registered email",
+        "Submit the form",
+        "Check email for reset link",
+        "Click on the reset link",
+        "Enter new password",
+        "Confirm new password",
+        "Submit the form"
+      ],
+      expectedResults: [
+        "Password reset email should be sent",
+        "User should be able to reset password",
+        "User should be able to login with new password"
+      ],
+      scenario: "Authentication",
+      priority: "medium"
+    },
+  ],
+  "1-v2": [
     {
       id: "1-tc1",
       title: "Verify User Login with Valid Credentials",
@@ -73,7 +118,28 @@ const taskTestCasesMap: { [key: string]: TestCaseProps[] } = {
       priority: "medium"
     },
   ],
-  "2": [
+  // Task 2 versions
+  "2-v1": [
+    {
+      id: "2-tc1",
+      title: "Verify Credit Card Payment",
+      preconditions: ["User is logged in", "User has items in cart"],
+      steps: [
+        "Navigate to checkout page",
+        "Select credit card payment method",
+        "Enter valid credit card details",
+        "Submit payment"
+      ],
+      expectedResults: [
+        "Payment should be processed successfully",
+        "Order confirmation page should be displayed",
+        "Confirmation email should be sent to the user"
+      ],
+      scenario: "Payment",
+      priority: "high"
+    },
+  ],
+  "2-v2": [
     {
       id: "2-tc1",
       title: "Verify Credit Card Payment",
@@ -111,7 +177,8 @@ const taskTestCasesMap: { [key: string]: TestCaseProps[] } = {
       priority: "high"
     },
   ],
-  "3": [
+  // Task 3 versions
+  "3-v1": [
     {
       id: "3-tc1",
       title: "Verify Profile Information Update",
@@ -130,7 +197,8 @@ const taskTestCasesMap: { [key: string]: TestCaseProps[] } = {
       priority: "medium"
     },
   ],
-  "4": [
+  // Task 4 versions
+  "4-v1": [
     {
       id: "4-tc1",
       title: "Test User Logout Functionality",
@@ -147,24 +215,27 @@ const taskTestCasesMap: { [key: string]: TestCaseProps[] } = {
       scenario: "Authentication",
       priority: "low"
     },
-  ],
+  ]
 };
 
 interface CenterPanelProps {
   isGenerating?: boolean;
   isAiModifying?: boolean;
   activeTask?: Task;
+  activeVersionId?: string;
 }
 
 const CenterPanel: React.FC<CenterPanelProps> = ({ 
   isGenerating = false, 
   isAiModifying = false,
-  activeTask
+  activeTask,
+  activeVersionId
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [priority, setPriority] = useState<string>("all");
   const [testCases, setTestCases] = useState<TestCaseProps[]>([]);
   const [progress, setProgress] = useState(0);
+  const [currentVersion, setCurrentVersion] = useState<Version | null>(null);
 
   useEffect(() => {
     if (isGenerating || isAiModifying) {
@@ -173,8 +244,9 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
         setProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
-            if (activeTask) {
-              setTestCases(taskTestCasesMap[activeTask.id] || []);
+            if (activeTask && activeVersionId) {
+              const versionKey = `${activeTask.id}-${activeVersionId.split('-').pop()}`;
+              setTestCases(testCasesMap[versionKey] || []);
             }
             return 100;
           }
@@ -184,14 +256,15 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
       
       return () => clearInterval(interval);
     } else {
-      if (activeTask) {
-        setTestCases(taskTestCasesMap[activeTask.id] || []);
+      if (activeTask && activeVersionId) {
+        const versionKey = `${activeTask.id}-${activeVersionId.split('-').pop()}`;
+        setTestCases(testCasesMap[versionKey] || []);
       } else {
         setTestCases([]);
       }
       setProgress(100);
     }
-  }, [isGenerating, isAiModifying, activeTask]);
+  }, [isGenerating, isAiModifying, activeTask, activeVersionId]);
 
   const filteredTestCases = testCases.filter((testCase) => {
     const matchesSearch = searchTerm === "" || 
@@ -210,12 +283,35 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
     exportTestCasesToExcel(filteredTestCases, filename);
   };
   
+  // Find current version name from activeVersionId
+  useEffect(() => {
+    if (activeTask && activeVersionId) {
+      // Assuming taskVersionsMap is accessible here or passed as a prop
+      const taskVersions = (window as any).taskVersionsMap?.[activeTask.id] || [];
+      const version = taskVersions.find((v: Version) => v.id === activeVersionId);
+      setCurrentVersion(version || null);
+    } else {
+      setCurrentVersion(null);
+    }
+  }, [activeTask, activeVersionId]);
+
   return (
     <div className="panel-transition w-full h-full p-4 flex flex-col white-panel">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-medium">
-          {activeTask ? `Test Cases: ${activeTask.title}` : 'Test Cases'}
-        </h2>
+        <div className="flex flex-col">
+          <h2 className="text-lg font-medium">
+            {activeTask ? `Test Cases: ${activeTask.title}` : 'Test Cases'}
+          </h2>
+          {currentVersion && (
+            <div className="flex items-center mt-1 text-sm text-muted-foreground">
+              <History className="h-3.5 w-3.5 mr-1" />
+              <span>Version: {currentVersion.name}</span>
+              <Badge variant="outline" className="ml-2 text-xs bg-primary/10 border-primary/20">
+                Current
+              </Badge>
+            </div>
+          )}
+        </div>
         <div className="flex space-x-2">
           <Button 
             variant="outline" 

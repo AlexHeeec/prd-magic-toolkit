@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import CenterPanel from "./CenterPanel";
 import LeftPanel from "./LeftPanel";
@@ -17,6 +16,13 @@ export interface Message {
   content: string;
   sender: "user" | "ai";
   timestamp: Date;
+}
+
+export interface Version {
+  id: string;
+  name: string;
+  timestamp: Date;
+  changes: string;
 }
 
 // Mock tasks data with associated test cases and chat messages
@@ -103,11 +109,61 @@ const mockTasks: Task[] = [
   }
 ];
 
+// Mock versions data for each task
+const taskVersionsMap: { [key: string]: Version[] } = {
+  "1": [
+    {
+      id: "1-v1",
+      name: "Initial Version",
+      timestamp: new Date(Date.now() - 3600000),
+      changes: "Generated 12 test cases for authentication flow"
+    },
+    {
+      id: "1-v2",
+      name: "Added Registration Tests",
+      timestamp: new Date(Date.now() - 2400000),
+      changes: "Added 3 test cases for user registration"
+    }
+  ],
+  "2": [
+    {
+      id: "2-v1",
+      name: "Initial Version",
+      timestamp: new Date(Date.now() - 4800000),
+      changes: "Generated 15 test cases for payment processing"
+    },
+    {
+      id: "2-v2",
+      name: "Added Payment Failure Tests",
+      timestamp: new Date(Date.now() - 3600000),
+      changes: "Added 3 test cases for payment failures"
+    }
+  ],
+  "3": [
+    {
+      id: "3-v1",
+      name: "Initial Version",
+      timestamp: new Date(Date.now() - 5600000),
+      changes: "Generated 15 test cases for profile management"
+    }
+  ],
+  "4": [
+    {
+      id: "4-v1",
+      name: "Initial Version",
+      timestamp: new Date(Date.now() - 6000000),
+      changes: "Generated 8 test cases for dashboard analytics"
+    }
+  ]
+};
+
 const Workspace: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isAiModifying, setIsAiModifying] = useState(false);
   const [activeTask, setActiveTask] = useState<Task | undefined>(undefined);
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
+  const [activeVersionId, setActiveVersionId] = useState<string | undefined>(undefined);
+  const [versions, setVersions] = useState<Version[]>([]);
 
   useEffect(() => {
     // Initialize with the first task if there's no active task
@@ -115,6 +171,24 @@ const Workspace: React.FC = () => {
       setActiveTask(tasks[0]);
     }
   }, [tasks, activeTask]);
+
+  useEffect(() => {
+    // When active task changes, update versions and set the latest version as active
+    if (activeTask) {
+      const taskVersions = taskVersionsMap[activeTask.id] || [];
+      setVersions(taskVersions);
+      
+      // Set the latest version as active by default
+      if (taskVersions.length > 0) {
+        setActiveVersionId(taskVersions[taskVersions.length - 1].id);
+      } else {
+        setActiveVersionId(undefined);
+      }
+    } else {
+      setVersions([]);
+      setActiveVersionId(undefined);
+    }
+  }, [activeTask]);
 
   const handleGenerate = () => {
     setIsGenerating(true);
@@ -139,6 +213,10 @@ const Workspace: React.FC = () => {
   const handleTaskSelect = (taskId: string) => {
     const selectedTask = tasks.find(task => task.id === taskId);
     setActiveTask(selectedTask);
+  };
+
+  const handleVersionSelect = (versionId: string) => {
+    setActiveVersionId(versionId);
   };
 
   const handleAddMessage = (message: Omit<Message, 'id'>) => {
@@ -184,6 +262,7 @@ const Workspace: React.FC = () => {
           isGenerating={isGenerating} 
           isAiModifying={isAiModifying} 
           activeTask={activeTask}
+          activeVersionId={activeVersionId}
         />
       </div>
       <div className="w-1/4 min-w-[300px] max-w-[400px]">
@@ -192,6 +271,9 @@ const Workspace: React.FC = () => {
           onAiModifying={handleAiAction}
           activeTask={activeTask}
           onAddMessage={handleAddMessage}
+          versions={versions}
+          activeVersionId={activeVersionId}
+          onVersionSelect={handleVersionSelect}
         />
       </div>
     </div>
