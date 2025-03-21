@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import CenterPanel from "./CenterPanel";
 import LeftPanel from "./LeftPanel";
@@ -110,7 +111,7 @@ const mockTasks: Task[] = [
 ];
 
 // Mock versions data for each task
-const taskVersionsMap: { [key: string]: Version[] } = {
+export const taskVersionsMap: { [key: string]: Version[] } = {
   "1": [
     {
       id: "1-v1",
