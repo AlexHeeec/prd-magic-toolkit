@@ -49,6 +49,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const versionsScrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const scrollToBottom = () => {
@@ -159,6 +160,12 @@ const RightPanel: React.FC<RightPanelProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (versionsScrollRef.current) {
+      versionsScrollRef.current.scrollTop = 0;
+    }
+  }, [versions]);
+
   return (
     <div className="panel-transition w-full h-full flex flex-col bg-white rounded-xl border border-primary/20 shadow-sm overflow-hidden">
       <Tabs defaultValue="chat" className="w-full h-full flex flex-col">
@@ -177,7 +184,6 @@ const RightPanel: React.FC<RightPanelProps> = ({
           {activeTask ? (
             <>
               <div className="flex-1 overflow-hidden">
-                {/* 修改这里的 ScrollArea 高度 */}
                 <ScrollArea className="h-full pr-4 py-4">
                   <div className="space-y-4">
                     {activeTask.messages.map((message) => (
@@ -279,8 +285,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
         
         <TabsContent value="versions" className="flex-1 flex flex-col p-4 pt-0 h-full overflow-hidden">
           {activeTask ? (
-            {/* 这里也修改 ScrollArea 高度 */}
-            <ScrollArea className="h-full pr-4 py-4">
+            <ScrollArea className="h-full pr-4 py-4" ref={versionsScrollRef}>
               <div className="space-y-3">
                 {versions.map((version) => (
                   <Card 
