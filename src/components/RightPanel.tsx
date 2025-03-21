@@ -279,7 +279,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
         
         <TabsContent value="versions" className="flex-1 flex flex-col p-4 pt-0 h-full overflow-hidden">
           {activeTask ? (
-            {/* 这里也可以根据需要修改 ScrollArea 高度 */}
+            {/* 这里也修改 ScrollArea 高度 */}
             <ScrollArea className="h-full pr-4 py-4">
               <div className="space-y-3">
                 {versions.map((version) => (
