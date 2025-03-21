@@ -166,9 +166,9 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
           </Button>
         </TabsContent>
         
-        <TabsContent value="history" className="mt-0 flex-1 overflow-hidden">
-          <ScrollArea className="h-[calc(100vh-200px)]">
-            <div className="space-y-3 pr-2">
+        <TabsContent value="history" className="mt-0 flex-1 overflow-hidden flex flex-col">
+          <ScrollArea className="h-[calc(100vh-200px)] flex-1">
+            <div className="space-y-3 pr-2 flex flex-col">
               {tasks.map((task) => (
                 <Card 
                   key={task.id} 
