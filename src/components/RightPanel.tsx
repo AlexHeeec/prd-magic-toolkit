@@ -253,7 +253,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
                 </ScrollArea>
               </div>
               
-              <div className="pt-3 relative">
+              <div className="pt-3 relative flex-shrink-0">
                 <Textarea
                   placeholder="Ask AI to modify test cases..."
                   value={newMessage}
