@@ -13,7 +13,7 @@ import { Task, Message, Version } from "./Workspace";
 // Sample AI responses based on user input
 const getAIResponse = (userInput: string): string => {
   const input = userInput.toLowerCase();
-  
+
   if (input.includes("add") && (input.includes("test") || input.includes("case"))) {
     return "I've added new test cases based on your request. You can see them in the test case panel.";
   } else if (input.includes("delete") || input.includes("remove")) {
@@ -37,8 +37,8 @@ interface RightPanelProps {
   onVersionSelect?: (versionId: string) => void;
 }
 
-const RightPanel: React.FC<RightPanelProps> = ({ 
-  isGenerating = false, 
+const RightPanel: React.FC<RightPanelProps> = ({
+  isGenerating = false,
   onAiModifying,
   activeTask,
   onAddMessage,
@@ -67,10 +67,10 @@ const RightPanel: React.FC<RightPanelProps> = ({
         sender: "ai",
         timestamp: new Date(),
       };
-      
+
       onAddMessage(generatingMessage);
       setIsTyping(true);
-      
+
       // Reset typing indicator when generation is complete
       return () => {
         setIsTyping(false);
@@ -80,35 +80,35 @@ const RightPanel: React.FC<RightPanelProps> = ({
 
   const handleSendMessage = () => {
     if (newMessage.trim() === "" || !activeTask || !onAddMessage) return;
-    
+
     const userMessage: Omit<Message, 'id'> = {
       content: newMessage,
       sender: "user",
       timestamp: new Date(),
     };
-    
+
     onAddMessage(userMessage);
     setNewMessage("");
     setIsTyping(true);
-    
+
     // Call the onAiModifying callback to indicate AI is processing changes
     if (onAiModifying) {
       onAiModifying(true);
     }
-    
+
     // Simulate AI processing and response
     setTimeout(() => {
       const aiResponse = getAIResponse(userMessage.content);
-      
+
       const aiMessage: Omit<Message, 'id'> = {
         content: aiResponse,
         sender: "ai",
         timestamp: new Date(),
       };
-      
+
       onAddMessage(aiMessage);
       setIsTyping(false);
-      
+
       // Add a new version if the message suggests modifications were made
       if (userMessage.content.toLowerCase().match(/add|delete|remove|modify|update|change|priority/)) {
         const newVersionId = `${activeTask.id}-v${versions.length + 1}`;
@@ -118,19 +118,19 @@ const RightPanel: React.FC<RightPanelProps> = ({
           timestamp: new Date(),
           changes: `Modified test cases based on: "${userMessage.content.substring(0, 40)}${userMessage.content.length > 40 ? '...' : ''}"`
         };
-        
+
         // Select the new version if onVersionSelect is provided
         if (onVersionSelect) {
           onVersionSelect(newVersionId);
         }
-        
+
         toast({
           title: "Test cases updated",
           description: "Changes have been applied based on your request",
           duration: 3000,
         });
       }
-      
+
       // Notify that AI has finished modifying
       if (onAiModifying) {
         onAiModifying(false);
@@ -172,16 +172,16 @@ const RightPanel: React.FC<RightPanelProps> = ({
             <span>Versions</span>
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="chat" className="flex-1 flex flex-col p-4 pt-0 h-full overflow-hidden">
           {activeTask ? (
             <div className="flex flex-col h-full">
-              {/* 聊天消息显示区域 */}
-              <div className="flex-1 overflow-y-auto h-[calc(100vh-200px)] pr-4 py-4"> 
+              {/* 聊天内容区域，可滚动 */}
+              <div className="flex-1 overflow-y-auto pr-4 py-4">
                 <div className="space-y-4">
                   {activeTask.messages.map((message) => (
-                    <div 
-                      key={message.id} 
+                    <div
+                      key={message.id}
                       className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div className={`flex max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -200,18 +200,18 @@ const RightPanel: React.FC<RightPanelProps> = ({
                             </Avatar>
                           )}
                         </div>
-                        <div 
+                        <div
                           className={`rounded-lg p-3 text-sm ${
-                            message.sender === 'user' 
-                              ? 'bg-primary text-primary-foreground' 
+                            message.sender === 'user'
+                              ? 'bg-primary text-primary-foreground'
                               : 'bg-accent/50'
                           }`}
                         >
                           {message.content}
-                          <div 
+                          <div
                             className={`text-xs mt-1 ${
-                              message.sender === 'user' 
-                                ? 'text-primary-foreground/70' 
+                              message.sender === 'user'
+                                ? 'text-primary-foreground/70'
                                 : 'text-muted-foreground'
                             }`}
                           >
@@ -244,9 +244,8 @@ const RightPanel: React.FC<RightPanelProps> = ({
                   <div ref={messagesEndRef} />
                 </div>
               </div>
-              
-              {/* 输入发送区域 */}
-              <div className="pt-3 relative flex-shrink-0"> 
+              {/* 输入框和发送按钮区域，固定在底部 */}
+              <div className="pt-3 relative flex-shrink-0">
                 <Textarea
                   placeholder="Ask AI to modify test cases..."
                   value={newMessage}
@@ -275,13 +274,13 @@ const RightPanel: React.FC<RightPanelProps> = ({
             </div>
           )}
         </TabsContent>
-        
+
         <TabsContent value="versions" className="flex-1 flex flex-col p-4 pt-0 h-full overflow-hidden">
           {activeTask ? (
             <ScrollArea className="h-[calc(100vh-200px)] pr-4 py-4">
               <div className="space-y-3">
                 {versions.map((version) => (
-                  <Card 
+                  <Card
                     key={version.id}
                     className={`p-3 hover:bg-accent/10 transition-colors cursor-pointer ${version.id === activeVersionId ? 'border-primary/30 bg-primary/5' : ''}`}
                     onClick={() => handleVersionClick(version.id)}
@@ -313,4 +312,4 @@ const RightPanel: React.FC<RightPanelProps> = ({
   );
 };
 
-export default RightPanel;    
+export default RightPanel;
