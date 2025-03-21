@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -69,10 +68,10 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   const hasContent = prdInput.length > 0 || selectedFile !== null;
 
   return (
-    <div className="panel-transition w-full h-full p-4 flex flex-col bg-white rounded-xl overflow-hidden">
+    <div className="panel-transition w-full h-full p-4 flex flex-col bg-sidebar rounded-xl">
       <h2 className="text-lg font-medium mb-4">Test Case Generation</h2>
       
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-2 mb-4">
           <TabsTrigger value="input" className="flex items-center gap-1">
             <FileText className="h-4 w-4" />
@@ -84,9 +83,10 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="input" className="mt-0 space-y-4 flex-1 overflow-hidden flex flex-col">
-          <div className="space-y-2 flex-1 overflow-hidden flex flex-col">
-            <Tabs defaultValue="text" className="flex-1 flex flex-col overflow-hidden">
+        <TabsContent value="input" className="mt-0 space-y-4">
+          {/* Input content */}
+          <div className="space-y-2">
+            <Tabs defaultValue="text">
               <TabsList className="grid grid-cols-2">
                 <TabsTrigger value="text" className="flex items-center gap-1">
                   <Text className="h-3 w-3" />
@@ -98,20 +98,18 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
                 </TabsTrigger>
               </TabsList>
               
-              <TabsContent value="text" className="mt-2 flex-1 overflow-hidden flex flex-col">
-                <div className="space-y-2 flex-1 overflow-hidden">
-                  <ScrollArea className="h-[calc(100vh-280px)]">
-                    <Textarea 
-                      placeholder="Paste your PRD content here..."
-                      className="min-h-[300px] resize-none"
-                      value={prdInput}
-                      onChange={(e) => setPrdInput(e.target.value)}
-                    />
-                  </ScrollArea>
+              <TabsContent value="text" className="mt-2">
+                <div className="space-y-2">
+                  <Textarea 
+                    placeholder="Paste your PRD content here..."
+                    className="min-h-[300px] resize-none"
+                    value={prdInput}
+                    onChange={(e) => setPrdInput(e.target.value)}
+                  />
                 </div>
               </TabsContent>
               
-              <TabsContent value="file" className="mt-2 flex-1 overflow-auto">
+              <TabsContent value="file" className="mt-2">
                 <div className="space-y-2">
                   <div className="border-2 border-dashed rounded-md p-6 text-center">
                     <FileUp className="mx-auto h-8 w-8 text-muted-foreground" />
@@ -166,9 +164,10 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
           </Button>
         </TabsContent>
         
-        <TabsContent value="history" className="mt-0 flex-1 overflow-hidden">
-          <ScrollArea className="h-[calc(100vh-200px)]">
-            <div className="space-y-3 pr-2">
+        <TabsContent value="history" className="mt-0">
+          {/* History content with scrollable area */}
+          <ScrollArea className="h-full max-h-[calc(100vh-200px)] overflow-y-auto pr-4">
+            <div className="space-y-3">
               {tasks.map((task) => (
                 <Card 
                   key={task.id} 
