@@ -211,7 +211,7 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
   };
   
   return (
-    <div className="panel-transition w-full h-full p-4 flex flex-col bg-white/80 dark:bg-secondary/50 backdrop-blur-sm border border-border rounded-lg">
+    <div className="panel-transition w-full h-full p-4 flex flex-col white-panel">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-medium">
           {activeTask ? `Test Cases: ${activeTask.title}` : 'Test Cases'}

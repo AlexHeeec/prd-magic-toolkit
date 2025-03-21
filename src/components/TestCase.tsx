@@ -54,12 +54,11 @@ const TestCase: React.FC<TestCaseProps> = ({
   return (
     <Card className={`w-full transition-all duration-300 overflow-hidden ${isDeleting ? 'opacity-0 scale-95' : 'opacity-100 scale-100'} hover:shadow-md border-primary/10`}>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CardHeader className="p-4 pb-2 bg-gradient-to-r from-white to-secondary/20 dark:from-secondary/50 dark:to-secondary/30">
+        <CardHeader className="p-4 pb-2 bg-white">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <CardTitle className="text-base">{title}</CardTitle>
               <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">{scenario}</Badge>
                 <Badge variant={priorityColor[priority] as any}>
                   {priority === "high" ? (
                     <AlertCircle className="h-3 w-3 mr-1" />
