@@ -192,10 +192,10 @@ const RightPanel: React.FC<RightPanelProps> = ({
             <MessageCircle className="h-4 w-4" />
             <span>AI Chat</span>
           </TabsTrigger>
-          {/* <TabsTrigger value="versions" className="flex items-center gap-1">
+          <TabsTrigger value="versions" className="flex items-center gap-1">
             <History className="h-4 w-4" />
             <span>Versions</span>
-          </TabsTrigger> */}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="chat" className="flex-1 flex flex-col p-4 pt-0 overflow-hidden TabsContent">
@@ -301,7 +301,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
           )}
         </TabsContent>
 
-        {/* <TabsContent value="versions" className="flex-1 flex flex-col p-4 pt-0 overflow-hidden TabsContent">
+        <TabsContent value="versions" className="flex-1 flex flex-col p-4 pt-0 overflow-hidden TabsContent">
           <div className="message-list">
             {activeTask ? (
               <div className="space-y-3">
@@ -332,7 +332,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
               </div>
             )}
           </div>
-        </TabsContent> */}
+        </TabsContent>
       </Tabs>
     </div>
   );
