@@ -167,19 +167,15 @@ const Workspace: React.FC = () => {
   const [versions, setVersions] = useState<Version[]>([]);
 
   useEffect(() => {
-    // Initialize with the first task if there's no active task
     if (!activeTask && tasks.length > 0) {
       setActiveTask(tasks[0]);
     }
   }, [tasks, activeTask]);
 
   useEffect(() => {
-    // When active task changes, update versions and set the latest version as active
     if (activeTask) {
       const taskVersions = taskVersionsMap[activeTask.id] || [];
       setVersions(taskVersions);
-      
-      // Set the latest version as active by default
       if (taskVersions.length > 0) {
         setActiveVersionId(taskVersions[taskVersions.length - 1].id);
       } else {
@@ -193,10 +189,8 @@ const Workspace: React.FC = () => {
 
   const handleGenerate = () => {
     setIsGenerating(true);
-    // Simulate API delay
     setTimeout(() => {
       setIsGenerating(false);
-      // After generating, select the first task
       if (tasks.length > 0) {
         setActiveTask(tasks[0]);
       }
@@ -205,7 +199,6 @@ const Workspace: React.FC = () => {
 
   const handleAiAction = () => {
     setIsAiModifying(true);
-    // Simulate AI modification delay
     setTimeout(() => {
       setIsAiModifying(false);
     }, 1500);
@@ -222,52 +215,50 @@ const Workspace: React.FC = () => {
 
   const handleAddMessage = (message: Omit<Message, 'id'>) => {
     if (!activeTask) return;
-    
-    // Create a copy of the tasks array
     const updatedTasks = [...tasks];
-    
-    // Find the index of the active task
     const taskIndex = updatedTasks.findIndex(task => task.id === activeTask.id);
-    
     if (taskIndex === -1) return;
-    
-    // Create a new message with a unique ID
     const newMessage = {
       ...message,
       id: `${activeTask.id}-${Date.now()}`
     };
-    
-    // Add the message to the active task's messages
     updatedTasks[taskIndex] = {
       ...updatedTasks[taskIndex],
       messages: [...updatedTasks[taskIndex].messages, newMessage]
     };
-    
-    // Update the tasks state and active task
     setTasks(updatedTasks);
     setActiveTask(updatedTasks[taskIndex]);
+  };
+
+  const handleTaskDelete = (taskId: string) => {
+    const updatedTasks = tasks.filter(task => task.id !== taskId);
+    setTasks(updatedTasks);
+    if (activeTask && activeTask.id === taskId) {
+      setActiveTask(updatedTasks.length > 0 ? updatedTasks[0] : undefined);
+    }
   };
 
   return (
     <div className="flex h-screen w-full gap-4 p-4 overflow-hidden">
       <div className="w-1/4 min-w-[300px] max-w-[400px] h-full overflow-hidden">
-        <LeftPanel 
-          onGenerate={handleGenerate} 
+        <LeftPanel
+          onGenerate={handleGenerate}
           tasks={tasks}
           activeTaskId={activeTask?.id}
           onTaskSelect={handleTaskSelect}
+          onTaskDelete={handleTaskDelete}
         />
       </div>
       <div className="flex-1 h-full overflow-hidden">
-        <CenterPanel 
-          isGenerating={isGenerating} 
-          isAiModifying={isAiModifying} 
+        <CenterPanel
+          isGenerating={isGenerating}
+          isAiModifying={isAiModifying}
           activeTask={activeTask}
           activeVersionId={activeVersionId}
         />
       </div>
       <div className="w-1/4 min-w-[300px] max-w-[400px] h-full overflow-hidden">
-        <RightPanel 
+        <RightPanel
           isGenerating={isGenerating}
           onAiModifying={handleAiAction}
           activeTask={activeTask}
