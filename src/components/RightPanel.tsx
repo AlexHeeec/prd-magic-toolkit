@@ -5,9 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { MessageCircle, History, Send, Bot, User, Trash, Loader2 } from "lucide-react";
+import { MessageCircle, Send, Bot, User, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Task, Message, Version } from "./Workspace";
 
@@ -51,7 +49,6 @@ const RightPanel: React.FC<RightPanelProps> = ({
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  const [messageHistory, setMessageHistory] = useState<string[]>([]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -82,9 +79,6 @@ const RightPanel: React.FC<RightPanelProps> = ({
 
   const handleSendMessage = () => {
     if (newMessage.trim() === "" || !activeTask || !onAddMessage) return;
-
-    // Add message to history
-    setMessageHistory(prev => [...prev, newMessage]);
 
     const userMessage: Omit<Message, 'id'> = {
       content: newMessage,
@@ -191,19 +185,15 @@ const RightPanel: React.FC<RightPanelProps> = ({
           }
         `}
       </style>
-      <Tabs defaultValue="chat" className="w-full h-full flex flex-col">
-        <TabsList className="grid grid-cols-2 mx-auto my-4 w-48">
-          <TabsTrigger value="chat" className="flex items-center gap-1">
+      <div className="w-full h-full flex flex-col">
+        <div className="grid mx-auto my-4">
+          <div className="flex items-center gap-1 font-medium">
             <MessageCircle className="h-4 w-4" />
             <span>AI Chat</span>
-          </TabsTrigger>
-          <TabsTrigger value="history" className="flex items-center gap-1">
-            <History className="h-4 w-4" />
-            <span>History</span>
-          </TabsTrigger>
-        </TabsList>
+          </div>
+        </div>
 
-        <TabsContent value="chat" className="flex-1 flex flex-col p-4 pt-0 overflow-hidden TabsContent">
+        <div className="flex-1 flex flex-col p-4 pt-0 overflow-hidden">
           {activeTask ? (
             <>
               <ScrollArea className="message-list flex-1">
@@ -304,36 +294,8 @@ const RightPanel: React.FC<RightPanelProps> = ({
               Select a task to view chat history
             </div>
           )}
-        </TabsContent>
-
-        <TabsContent value="history" className="flex-1 flex flex-col p-4 pt-0 overflow-hidden TabsContent">
-          <ScrollArea className="flex-1">
-            {messageHistory.length > 0 ? (
-              <div className="space-y-2">
-                <h3 className="font-medium text-sm mb-4">Your Message History</h3>
-                {messageHistory.map((message, index) => (
-                  <Card key={index} className="p-3 text-sm">
-                    <div className="flex gap-2 items-start">
-                      <Avatar className="h-6 w-6">
-                        <AvatarFallback className="bg-secondary/50 text-xs">
-                          <User className="h-3 w-3" />
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        {message}
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                No message history yet
-              </div>
-            )}
-          </ScrollArea>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 };
