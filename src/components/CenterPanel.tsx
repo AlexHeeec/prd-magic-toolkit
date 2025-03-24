@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import TestCase, { TestCaseProps } from "./TestCase";
 import { Button } from "@/components/ui/button";
@@ -417,7 +418,7 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
                       <TableRow>
                         <TableHead className="w-[55%]">Test Case</TableHead>
                         <TableHead className="w-[10%]">Priority</TableHead>
-                        <TableHead className="w-[35%] text-right">Actions</TableHead>
+                        <TableHead className="w-[10%] text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
