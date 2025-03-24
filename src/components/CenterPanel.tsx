@@ -5,10 +5,18 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { FileDown, BarChart2, History } from "lucide-react";
+import { FileDown, BarChart2, History, List } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Task, Version } from "./Workspace";
 import { exportTestCasesToExcel } from "@/utils/excelExport";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
 
 // Mock test case data for each task and version
 const testCasesMap: { [key: string]: TestCaseProps[] } = {
@@ -403,14 +411,27 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
           {filteredTestCases.length > 0 ? (
             <div className="flex-1 overflow-hidden">
               <ScrollArea className="h-[calc(100vh-280px)]">
-                <div className="space-y-3 pb-4 pr-4">
-                  {filteredTestCases.map((testCase) => (
-                    <TestCase 
-                      key={testCase.id} 
-                      {...testCase} 
-                      onUpdate={handleUpdateTestCase}
-                    />
-                  ))}
+                <div className="pb-4 pr-4">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[400px]">Test Case</TableHead>
+                        <TableHead>Scenario</TableHead>
+                        <TableHead>Priority</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredTestCases.map((testCase) => (
+                        <TestCase 
+                          key={testCase.id} 
+                          {...testCase} 
+                          onUpdate={handleUpdateTestCase}
+                          viewType="list"
+                        />
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               </ScrollArea>
             </div>

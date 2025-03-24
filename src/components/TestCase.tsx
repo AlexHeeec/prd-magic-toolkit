@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, Edit, Copy, Trash, CheckCircle, AlertCircle } from "lucide-react";
+import { MoreHorizontal, Edit, Copy, Trash, CheckCircle, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +42,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { TableRow, TableCell } from "@/components/ui/table";
 
 export interface TestCaseProps {
   id: string;
@@ -51,6 +52,7 @@ export interface TestCaseProps {
   expectedResults: string[];
   scenario: string;
   priority: "high" | "medium" | "low";
+  viewType?: "card" | "list";
   onUpdate?: (id: string, updatedTestCase: Partial<TestCaseProps>) => void;
 }
 
@@ -62,6 +64,7 @@ const TestCase: React.FC<TestCaseProps> = ({
   expectedResults,
   scenario,
   priority,
+  viewType = "card",
   onUpdate,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -138,6 +141,198 @@ const TestCase: React.FC<TestCaseProps> = ({
     low: "secondary",
   };
 
+  // Render as a list item
+  if (viewType === "list") {
+    return (
+      <>
+        <TableRow className={`transition-all duration-300 ${isDeleting ? 'opacity-0' : 'opacity-100'}`}>
+          <TableCell>
+            <div className="font-medium max-w-[380px] truncate">{title}</div>
+          </TableCell>
+          <TableCell>{scenario}</TableCell>
+          <TableCell>
+            <Badge variant={priorityColor[priority] as any} className="whitespace-nowrap">
+              {priority === "high" ? (
+                <AlertCircle className="h-3 w-3 mr-1" />
+              ) : priority === "low" ? (
+                <CheckCircle className="h-3 w-3 mr-1" />
+              ) : null}
+              {priority}
+            </Badge>
+          </TableCell>
+          <TableCell className="text-right">
+            <div className="flex justify-end space-x-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 text-primary hover:bg-primary/10"
+                onClick={() => setIsOpen(!isOpen)}
+              >
+                {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 text-primary hover:bg-primary/10"
+                onClick={handleEditClick}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-primary hover:bg-primary/10">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem className="cursor-pointer" onClick={handleEditClick}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    <span>Edit</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Copy className="h-4 w-4 mr-2" />
+                    <span>Duplicate</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer text-destructive" onClick={handleDeleteClick}>
+                    <Trash className="h-4 w-4 mr-2" />
+                    <span>Delete</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </TableCell>
+        </TableRow>
+        {isOpen && (
+          <TableRow>
+            <TableCell colSpan={4} className="pb-4">
+              <div className="bg-muted/20 rounded-md p-3 mt-2 space-y-3 border border-border/50">
+                <div>
+                  <h4 className="text-xs font-medium text-primary mb-1">Preconditions</h4>
+                  <ul className="list-disc list-inside text-sm space-y-1">
+                    {preconditions.map((condition, index) => (
+                      <li key={index}>{condition}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-xs font-medium text-primary mb-1">Steps</h4>
+                  <ol className="list-decimal list-inside text-sm space-y-1">
+                    {steps.map((step, index) => (
+                      <li key={index}>{step}</li>
+                    ))}
+                  </ol>
+                </div>
+                <div>
+                  <h4 className="text-xs font-medium text-primary mb-1">Expected Results</h4>
+                  <ul className="list-disc list-inside text-sm space-y-1">
+                    {expectedResults.map((result, index) => (
+                      <li key={index}>{result}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </TableCell>
+          </TableRow>
+        )}
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Test Case</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete "{title}"? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Edit Dialog */}
+        <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Test Case</DialogTitle>
+              <DialogDescription>
+                Make changes to the test case details below.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="priority">Priority</Label>
+                <Select 
+                  value={editPriority} 
+                  onValueChange={(value: "high" | "medium" | "low") => setEditPriority(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="preconditions">Preconditions (one per line)</Label>
+                <Textarea
+                  id="preconditions"
+                  value={editPreconditions}
+                  onChange={(e) => setEditPreconditions(e.target.value)}
+                  rows={3}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="steps">Steps (one per line)</Label>
+                <Textarea
+                  id="steps"
+                  value={editSteps}
+                  onChange={(e) => setEditSteps(e.target.value)}
+                  rows={4}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="expected-results">Expected Results (one per line)</Label>
+                <Textarea
+                  id="expected-results"
+                  value={editExpectedResults}
+                  onChange={(e) => setEditExpectedResults(e.target.value)}
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveEdit}>Save Changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  }
+
+  // Render as a card (original view)
   return (
     <>
       <Card className={`w-full transition-all duration-300 overflow-hidden ${isDeleting ? 'opacity-0 scale-95' : 'opacity-100 scale-100'} hover:shadow-md border-primary/10`}>
