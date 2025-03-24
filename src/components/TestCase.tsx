@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -132,6 +133,14 @@ const TestCase: React.FC<TestCaseProps> = ({
     }, 300);
   };
 
+  const toggleDetails = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setIsOpen(!isOpen);
+  };
+
   if (!isVisible) return null;
 
   const priorityColor = {
@@ -146,7 +155,12 @@ const TestCase: React.FC<TestCaseProps> = ({
       <>
         <TableRow className={`transition-all duration-300 ${isDeleting ? 'opacity-0' : 'opacity-100'}`}>
           <TableCell>
-            <div className="font-medium max-w-[380px] truncate">{title}</div>
+            <div 
+              className="font-medium max-w-[380px] truncate cursor-pointer hover:text-primary transition-colors"
+              onClick={toggleDetails}
+            >
+              {title}
+            </div>
           </TableCell>
           <TableCell>
             <Badge variant={priorityColor[priority] as any} className="whitespace-nowrap">
@@ -164,7 +178,8 @@ const TestCase: React.FC<TestCaseProps> = ({
                 variant="ghost"
                 size="sm"
                 className="h-7 w-7 p-0 text-primary hover:bg-primary/10"
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={toggleDetails}
+                aria-label={isOpen ? "Collapse" : "Expand"}
               >
                 {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
@@ -329,8 +344,8 @@ const TestCase: React.FC<TestCaseProps> = ({
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <CardHeader className="p-4 pb-2 bg-white">
             <div className="flex items-start justify-between">
-              <div className="space-y-1">
-                <CardTitle className="text-base">{title}</CardTitle>
+              <div className="space-y-1 cursor-pointer" onClick={toggleDetails}>
+                <CardTitle className="text-base hover:text-primary transition-colors">{title}</CardTitle>
                 <div className="flex flex-wrap gap-2">
                   <Badge variant={priorityColor[priority] as any}>
                     {priority === "high" ? (
@@ -343,19 +358,19 @@ const TestCase: React.FC<TestCaseProps> = ({
                 </div>
               </div>
               <div className="flex space-x-1">
-                <CollapsibleTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-primary hover:bg-primary/10">
-                    {isOpen ? (
-                      <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                      </svg>
-                    ) : (
-                      <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    )}
-                  </Button>
-                </CollapsibleTrigger>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 px-2 text-primary hover:bg-primary/10"
+                  onClick={toggleDetails}
+                  aria-label={isOpen ? "Collapse" : "Expand"}
+                >
+                  {isOpen ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="h-7 px-2 text-primary hover:bg-primary/10">
