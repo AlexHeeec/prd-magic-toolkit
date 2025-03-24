@@ -1,11 +1,11 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageCircle, Send, Bot, User, Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Task, Message, Version } from "./Workspace";
 
 // Sample AI responses based on user input
@@ -49,12 +49,17 @@ const RightPanel: React.FC<RightPanelProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [activeTask?.messages]);
+
+  // Debug logs for messages
+  useEffect(() => {
+    if (activeTask?.messages) {
+      console.log("Current messages:", activeTask.messages);
+    }
   }, [activeTask?.messages]);
 
   // Show loading state when test cases are being generated
@@ -78,7 +83,9 @@ const RightPanel: React.FC<RightPanelProps> = ({
 
   const handleSendMessage = () => {
     if (newMessage.trim() === "" || !activeTask || !onAddMessage) return;
-
+    
+    console.log("Sending message:", newMessage);
+    
     // 创建用户消息对象并添加到消息列表
     const userMessage: Omit<Message, 'id'> = {
       content: newMessage,
@@ -152,16 +159,6 @@ const RightPanel: React.FC<RightPanelProps> = ({
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-  };
-
-  const handleVersionClick = (versionId: string) => {
-    if (onVersionSelect) {
-      onVersionSelect(versionId);
-    }
-  };
-
   return (
     <div className="panel-transition w-full h-full flex flex-col bg-white rounded-xl border border-primary/20 shadow-sm overflow-hidden">
       <style>
@@ -170,10 +167,6 @@ const RightPanel: React.FC<RightPanelProps> = ({
             display: flex;
             flex-direction: column;
             min-height: 0; /* 修复Safari浏览器滚动问题 */
-          }
-          .TabsContent {
-            contain: strict; /* 优化渲染性能 */
-            overscroll-behavior: contain; /* 防止滚动穿透 */
           }
           .message-list {
             flex: 1;
@@ -202,48 +195,54 @@ const RightPanel: React.FC<RightPanelProps> = ({
             <>
               <ScrollArea className="message-list flex-1">
                 <div className="space-y-4">
-                  {activeTask.messages && activeTask.messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div className={`flex max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                        <div className={`flex-shrink-0 ${message.sender === 'user' ? 'ml-2' : 'mr-2'}`}>
-                          {message.sender === 'ai' ? (
-                            <Avatar className="h-8 w-8">
-                              <AvatarFallback className="bg-primary/10 text-primary">
-                                <Bot className="h-4 w-4" />
-                              </AvatarFallback>
-                            </Avatar>
-                          ) : (
-                            <Avatar className="h-8 w-8">
-                              <AvatarFallback className="bg-secondary/50">
-                                <User className="h-4 w-4" />
-                              </AvatarFallback>
-                            </Avatar>
-                          )}
-                        </div>
-                        <div
-                          className={`rounded-lg p-3 text-sm ${
-                            message.sender === 'user'
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-accent/50'
-                          }`}
-                        >
-                          {message.content}
+                  {activeTask.messages && activeTask.messages.length > 0 ? (
+                    activeTask.messages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div className={`flex max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                          <div className={`flex-shrink-0 ${message.sender === 'user' ? 'ml-2' : 'mr-2'}`}>
+                            {message.sender === 'ai' ? (
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-primary/10 text-primary">
+                                  <Bot className="h-4 w-4" />
+                                </AvatarFallback>
+                              </Avatar>
+                            ) : (
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-secondary/50">
+                                  <User className="h-4 w-4" />
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
+                          </div>
                           <div
-                            className={`text-xs mt-1 ${
+                            className={`rounded-lg p-3 text-sm ${
                               message.sender === 'user'
-                                ? 'text-primary-foreground/70'
-                                : 'text-muted-foreground'
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-accent/50'
                             }`}
                           >
-                            {formatTime(message.timestamp)}
+                            {message.content}
+                            <div
+                              className={`text-xs mt-1 ${
+                                message.sender === 'user'
+                                  ? 'text-primary-foreground/70'
+                                  : 'text-muted-foreground'
+                              }`}
+                            >
+                              {formatTime(message.timestamp)}
+                            </div>
                           </div>
                         </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-muted-foreground">
+                      No messages yet. Start the conversation!
                     </div>
-                  ))}
+                  )}
                   {isTyping && (
                     <div className="flex justify-start">
                       <div className="flex flex-row">

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import CenterPanel from "./CenterPanel";
 import LeftPanel from "./LeftPanel";
@@ -243,33 +244,40 @@ const Workspace: React.FC = () => {
   };
 
   const handleAddMessage = (message: Omit<Message, 'id'>) => {
-    if (!activeTask) return;
+    if (!activeTask) {
+      console.error("No active task to add message to");
+      return;
+    }
     
-    // 创建消息副本数组
+    // Create a deep copy of the tasks array
     const updatedTasks = [...tasks];
     
-    // 找到活动任务的索引
+    // Find the index of the active task
     const taskIndex = updatedTasks.findIndex(task => task.id === activeTask.id);
     
-    if (taskIndex === -1) return;
+    if (taskIndex === -1) {
+      console.error("Active task not found in tasks array");
+      return;
+    }
     
-    // 创建带有唯一ID的新消息
+    // Create a new message with a unique ID
     const newMessage = {
       ...message,
       id: `${activeTask.id}-${Date.now()}`
     };
     
-    // 将消息添加到活动任务的消息列表
+    console.log("Message added:", newMessage);
+    
+    // Make a deep copy of the task to modify
     updatedTasks[taskIndex] = {
       ...updatedTasks[taskIndex],
       messages: [...updatedTasks[taskIndex].messages, newMessage]
     };
     
-    // 更新任务状态和活动任务
+    // Update the tasks state and active task
     setTasks(updatedTasks);
     setActiveTask(updatedTasks[taskIndex]);
     
-    console.log("Message added:", newMessage);
     console.log("Updated active task messages:", updatedTasks[taskIndex].messages);
   };
 
