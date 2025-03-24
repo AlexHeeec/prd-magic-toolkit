@@ -1,8 +1,18 @@
-
 import React, { useState, useEffect } from "react";
 import CenterPanel from "./CenterPanel";
 import LeftPanel from "./LeftPanel";
 import RightPanel from "./RightPanel";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "@/hooks/use-toast";
 
 export interface Task {
   id: string;
@@ -165,6 +175,8 @@ const Workspace: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [activeVersionId, setActiveVersionId] = useState<string | undefined>(undefined);
   const [versions, setVersions] = useState<Version[]>([]);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
   useEffect(() => {
     // Initialize with the first task if there's no active task
@@ -286,6 +298,46 @@ const Workspace: React.FC = () => {
     setActiveTask(updatedTask);
   };
 
+  const handleDeleteTask = (taskId: string, event?: React.MouseEvent) => {
+    // Prevent task selection when clicking delete icon
+    if (event) {
+      event.stopPropagation();
+    }
+    
+    // Find task to delete
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+      setTaskToDelete(task);
+      setIsConfirmDialogOpen(true);
+    }
+  };
+
+  const confirmDeleteTask = () => {
+    if (!taskToDelete) return;
+    
+    const updatedTasks = tasks.filter(task => task.id !== taskToDelete.id);
+    setTasks(updatedTasks);
+    
+    // If the active task is being deleted, set a new active task
+    if (activeTask && activeTask.id === taskToDelete.id) {
+      setActiveTask(updatedTasks.length > 0 ? updatedTasks[0] : undefined);
+    }
+    
+    toast({
+      title: "Task deleted",
+      description: `"${taskToDelete.title}" has been removed.`,
+    });
+    
+    // Close the dialog and reset taskToDelete
+    setIsConfirmDialogOpen(false);
+    setTaskToDelete(null);
+  };
+
+  const cancelDeleteTask = () => {
+    setIsConfirmDialogOpen(false);
+    setTaskToDelete(null);
+  };
+
   return (
     <div className="flex h-screen w-full gap-4 p-4 overflow-hidden">
       <div className="w-1/4 min-w-[300px] max-w-[400px] h-full overflow-hidden">
@@ -294,6 +346,7 @@ const Workspace: React.FC = () => {
           tasks={tasks}
           activeTaskId={activeTask?.id}
           onTaskSelect={handleTaskSelect}
+          onDeleteTask={handleDeleteTask}
         />
       </div>
       <div className="flex-1 h-full overflow-hidden">
@@ -315,6 +368,25 @@ const Workspace: React.FC = () => {
           onVersionSelect={handleVersionSelect}
         />
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this task?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete "{taskToDelete?.title}" and remove all associated test cases and messages.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelDeleteTask}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteTask} className="bg-red-500 hover:bg-red-600">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

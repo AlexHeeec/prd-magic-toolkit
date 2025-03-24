@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,7 +9,8 @@ import {
   Text,
   FileText,
   Play,
-  History
+  History,
+  Trash2
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
@@ -26,13 +28,15 @@ interface LeftPanelProps {
   tasks: Task[];
   activeTaskId?: string;
   onTaskSelect: (taskId: string) => void;
+  onDeleteTask: (taskId: string, event?: React.MouseEvent) => void;
 }
 
 const LeftPanel: React.FC<LeftPanelProps> = ({ 
   onGenerate, 
   tasks,
   activeTaskId,
-  onTaskSelect 
+  onTaskSelect,
+  onDeleteTask
 }) => {
   const [prdInput, setPrdInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -182,10 +186,22 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
                   </CardHeader>
                   <CardFooter className="p-4 pt-0 flex justify-between">
                     <span className="text-xs text-muted-foreground">{task.caseCount} test cases</span>
-                    <Button variant="ghost" size="sm" className="h-7 px-2">
-                      <FileText className="h-3.5 w-3.5" />
-                      <span className="sr-only">View</span>
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button variant="ghost" size="sm" className="h-7 px-2">
+                        <FileText className="h-3.5 w-3.5" />
+                        <span className="sr-only">View</span>
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 px-2 text-red-500 hover:text-red-700 hover:bg-red-100"
+                        onClick={(e) => onDeleteTask(task.id, e)}
+                        aria-label="Delete task"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </div>
                   </CardFooter>
                 </Card>
               ))}
