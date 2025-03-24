@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import TestCase, { TestCaseProps } from "./TestCase";
 import { Button } from "@/components/ui/button";
@@ -294,6 +293,26 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
       setCurrentVersion(null);
     }
   }, [activeTask, activeVersionId]);
+  
+  // Add the handler for updating test cases
+  const handleUpdateTestCase = (id: string, updatedTestCase: Partial<TestCaseProps>) => {
+    setTestCases(prevTestCases => {
+      const updatedTestCases = prevTestCases.map(testCase => {
+        if (testCase.id === id) {
+          return { ...testCase, ...updatedTestCase };
+        }
+        return testCase;
+      });
+      
+      // Update the test cases in the testCasesMap as well
+      if (activeTask && activeVersionId) {
+        const versionKey = `${activeTask.id}-${activeVersionId.split('-').pop()}`;
+        testCasesMap[versionKey] = updatedTestCases;
+      }
+      
+      return updatedTestCases;
+    });
+  };
 
   return (
     <div className="panel-transition w-full h-full p-4 flex flex-col white-panel overflow-hidden">
@@ -386,7 +405,11 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
               <ScrollArea className="h-[calc(100vh-280px)]">
                 <div className="space-y-3 pb-4 pr-4">
                   {filteredTestCases.map((testCase) => (
-                    <TestCase key={testCase.id} {...testCase} />
+                    <TestCase 
+                      key={testCase.id} 
+                      {...testCase} 
+                      onUpdate={handleUpdateTestCase}
+                    />
                   ))}
                 </div>
               </ScrollArea>
