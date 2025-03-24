@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import TestCase, { TestCaseProps } from "./TestCase";
 import { Button } from "@/components/ui/button";
@@ -410,13 +411,12 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
           
           {filteredTestCases.length > 0 ? (
             <div className="flex-1 overflow-hidden">
-              <ScrollArea className="h-[calc(100vh-280px)]">
-                <div className="pb-4 pr-4">
-                  <Table>
+              <ScrollArea className="h-[calc(100vh-280px)]" orientation="both">
+                <div className="pb-4">
+                  <Table className="min-w-[800px]">
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-[400px]">Test Case</TableHead>
-                        <TableHead>Scenario</TableHead>
                         <TableHead>Priority</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>

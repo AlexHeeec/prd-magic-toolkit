@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -149,7 +148,6 @@ const TestCase: React.FC<TestCaseProps> = ({
           <TableCell>
             <div className="font-medium max-w-[380px] truncate">{title}</div>
           </TableCell>
-          <TableCell>{scenario}</TableCell>
           <TableCell>
             <Badge variant={priorityColor[priority] as any} className="whitespace-nowrap">
               {priority === "high" ? (
@@ -205,7 +203,7 @@ const TestCase: React.FC<TestCaseProps> = ({
         </TableRow>
         {isOpen && (
           <TableRow>
-            <TableCell colSpan={4} className="pb-4">
+            <TableCell colSpan={3} className="pb-4">
               <div className="bg-muted/20 rounded-md p-3 mt-2 space-y-3 border border-border/50">
                 <div>
                   <h4 className="text-xs font-medium text-primary mb-1">Preconditions</h4>
