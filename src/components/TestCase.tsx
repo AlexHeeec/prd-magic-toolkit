@@ -76,7 +76,7 @@ const TestCase: React.FC<TestCaseProps> = ({
   const [editPreconditions, setEditPreconditions] = useState(preconditions.join('\n'));
   const [editSteps, setEditSteps] = useState(steps.join('\n'));
   const [editExpectedResults, setEditExpectedResults] = useState(expectedResults.join('\n'));
-  const [editPriority, setEditPriority] = useState(priority);
+  const [editPriority, setEditPriority] = useState<"high" | "medium" | "low">(priority);
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -105,7 +105,7 @@ const TestCase: React.FC<TestCaseProps> = ({
         preconditions: editPreconditions.split('\n').filter(line => line.trim() !== ''),
         steps: editSteps.split('\n').filter(line => line.trim() !== ''),
         expectedResults: editExpectedResults.split('\n').filter(line => line.trim() !== ''),
-        priority: editPriority as "high" | "medium" | "low",
+        priority: editPriority,
       };
       
       onUpdate(id, updatedTestCase);
@@ -269,7 +269,10 @@ const TestCase: React.FC<TestCaseProps> = ({
             
             <div className="grid gap-2">
               <Label htmlFor="priority">Priority</Label>
-              <Select value={editPriority} onValueChange={setEditPriority}>
+              <Select 
+                value={editPriority} 
+                onValueChange={(value: "high" | "medium" | "low") => setEditPriority(value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
