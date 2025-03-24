@@ -416,9 +416,9 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
                   <Table className="min-w-[650px]">
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[80%]">Test Case</TableHead>
-                        <TableHead className="w-[5%]">Priority</TableHead>
-                        <TableHead className="w-[15%] text-right">Actions</TableHead>
+                        <TableHead className="w-[65%]">Test Case</TableHead>
+                        <TableHead className="w-[15%]">Priority</TableHead>
+                        <TableHead className="w-[20%] text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
