@@ -86,11 +86,11 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-gray-200;
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-gray-50 text-gray-900 antialiased;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
     background-image: radial-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px);
     background-size: 30px 30px;
@@ -111,11 +111,11 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary/30 rounded-full;
+    @apply bg-blue-500/30 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary/50;
+    @apply bg-blue-500/50;
   }
 }
 

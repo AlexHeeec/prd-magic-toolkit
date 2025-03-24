@@ -1,9 +1,6 @@
 
 import React, { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageCircle, Send, Bot, User, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Task, Message, Version } from "./Workspace";
@@ -163,14 +160,9 @@ const RightPanel: React.FC<RightPanelProps> = ({
   };
 
   return (
-    <div className="panel-transition w-full h-full flex flex-col bg-white rounded-xl border border-primary/20 shadow-sm overflow-hidden">
+    <div className="w-full h-full flex flex-col bg-white rounded-xl border border-blue-500/20 shadow-sm overflow-hidden transition-all duration-300 ease-in-out">
       <style>
         {`
-          .panel-transition {
-            display: flex;
-            flex-direction: column;
-            min-height: 0; /* Fix Safari scrolling issues */
-          }
           .message-list {
             flex: 1;
             overflow-y: auto;
@@ -196,7 +188,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
         <div className="flex-1 flex flex-col p-4 pt-0 overflow-hidden">
           {activeTask ? (
             <>
-              <ScrollArea className="message-list flex-1">
+              <div className="message-list flex-1 overflow-y-auto">
                 <div className="space-y-4" data-testid="message-container">
                   {activeTask.messages && activeTask.messages.length > 0 ? (
                     activeTask.messages.map((message, index) => (
@@ -208,32 +200,28 @@ const RightPanel: React.FC<RightPanelProps> = ({
                         <div className={`flex max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                           <div className={`flex-shrink-0 ${message.sender === 'user' ? 'ml-2' : 'mr-2'}`}>
                             {message.sender === 'ai' ? (
-                              <Avatar className="h-8 w-8">
-                                <AvatarFallback className="bg-primary/10 text-primary">
-                                  <Bot className="h-4 w-4" />
-                                </AvatarFallback>
-                              </Avatar>
+                              <div className="h-8 w-8 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                                <Bot className="h-4 w-4" />
+                              </div>
                             ) : (
-                              <Avatar className="h-8 w-8">
-                                <AvatarFallback className="bg-secondary/50">
-                                  <User className="h-4 w-4" />
-                                </AvatarFallback>
-                              </Avatar>
+                              <div className="h-8 w-8 rounded-full bg-gray-200/50 flex items-center justify-center">
+                                <User className="h-4 w-4" />
+                              </div>
                             )}
                           </div>
                           <div
                             className={`rounded-lg p-3 text-sm ${
                               message.sender === 'user'
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-accent/50'
+                                ? 'bg-blue-500 text-white'
+                                : 'bg-blue-500/10'
                             }`}
                           >
                             {message.content}
                             <div
                               className={`text-xs mt-1 ${
                                 message.sender === 'user'
-                                  ? 'text-primary-foreground/70'
-                                  : 'text-muted-foreground'
+                                  ? 'text-white/70'
+                                  : 'text-gray-500'
                               }`}
                             >
                               {formatTime(message.timestamp instanceof Date ? message.timestamp : new Date(message.timestamp))}
@@ -243,7 +231,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
                       </div>
                     ))
                   ) : (
-                    <div className="text-center text-muted-foreground">
+                    <div className="text-center text-gray-500">
                       No messages yet. Start the conversation!
                     </div>
                   )}
@@ -251,17 +239,15 @@ const RightPanel: React.FC<RightPanelProps> = ({
                     <div className="flex justify-start">
                       <div className="flex flex-row">
                         <div className="flex-shrink-0 mr-2">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback className="bg-primary/10 text-primary">
-                              <Bot className="h-4 w-4" />
-                            </AvatarFallback>
-                          </Avatar>
+                          <div className="h-8 w-8 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                            <Bot className="h-4 w-4" />
+                          </div>
                         </div>
-                        <div className="rounded-lg p-3 bg-accent/50">
+                        <div className="rounded-lg p-3 bg-blue-500/10">
                           <div className="flex space-x-1">
-                            <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse"></div>
-                            <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                            <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                            <div className="h-2 w-2 rounded-full bg-gray-400/40 animate-pulse"></div>
+                            <div className="h-2 w-2 rounded-full bg-gray-400/40 animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                            <div className="h-2 w-2 rounded-full bg-gray-400/40 animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                           </div>
                         </div>
                       </div>
@@ -269,7 +255,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
                   )}
                   <div ref={messagesEndRef} />
                 </div>
-              </ScrollArea>
+              </div>
 
               <div className="input-area mt-4">
                 <div className="relative">
@@ -280,9 +266,12 @@ const RightPanel: React.FC<RightPanelProps> = ({
                     onKeyDown={handleKeyDown}
                     className="min-h-[80px] pr-10 resize-none shadow-lg"
                   />
-                  <Button
-                    size="icon"
-                    className="absolute right-2 bottom-2"
+                  <button
+                    className={`absolute right-2 bottom-2 p-2 rounded-md ${
+                      newMessage.trim() === "" || isTyping
+                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                        : "bg-blue-500 text-white hover:bg-blue-600"
+                    }`}
                     onClick={handleSendMessage}
                     disabled={newMessage.trim() === "" || isTyping}
                   >
@@ -292,12 +281,12 @@ const RightPanel: React.FC<RightPanelProps> = ({
                       <Send className="h-4 w-4" />
                     )}
                     <span className="sr-only">Send</span>
-                  </Button>
+                  </button>
                 </div>
               </div>
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-muted-foreground">
+            <div className="flex-1 flex items-center justify-center text-gray-500">
               Select a task to view chat history
             </div>
           )}
