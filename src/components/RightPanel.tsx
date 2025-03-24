@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -80,22 +79,26 @@ const RightPanel: React.FC<RightPanelProps> = ({
   const handleSendMessage = () => {
     if (newMessage.trim() === "" || !activeTask || !onAddMessage) return;
 
+    // 创建用户消息对象并添加到消息列表
     const userMessage: Omit<Message, 'id'> = {
       content: newMessage,
       sender: "user",
       timestamp: new Date(),
     };
 
+    // 添加用户消息到消息列表
     onAddMessage(userMessage);
+    
+    // 清空输入框并设置正在输入状态
     setNewMessage("");
     setIsTyping(true);
 
-    // Call the onAiModifying callback to indicate AI is processing changes
+    // 通知AI正在处理变更
     if (onAiModifying) {
       onAiModifying(true);
     }
 
-    // Simulate AI processing and response
+    // 模拟AI处理和响应
     setTimeout(() => {
       const aiResponse = getAIResponse(userMessage.content);
 
@@ -105,10 +108,11 @@ const RightPanel: React.FC<RightPanelProps> = ({
         timestamp: new Date(),
       };
 
+      // 添加AI响应到消息列表
       onAddMessage(aiMessage);
       setIsTyping(false);
 
-      // Add a new version if the message suggests modifications were made
+      // 如果消息建议进行了修改，则添加新版本
       if (userMessage.content.toLowerCase().match(/add|delete|remove|modify|update|change|priority/)) {
         const newVersionId = `${activeTask.id}-v${versions.length + 1}`;
         const newVersion: Version = {
@@ -118,7 +122,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
           changes: `Modified test cases based on: "${userMessage.content.substring(0, 40)}${userMessage.content.length > 40 ? '...' : ''}"`
         };
 
-        // Select the new version if onVersionSelect is provided
+        // 选择新版本
         if (onVersionSelect) {
           onVersionSelect(newVersionId);
         }
@@ -130,7 +134,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
         });
       }
 
-      // Notify that AI has finished modifying
+      // 通知AI已完成修改
       if (onAiModifying) {
         onAiModifying(false);
       }
@@ -198,7 +202,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
             <>
               <ScrollArea className="message-list flex-1">
                 <div className="space-y-4">
-                  {activeTask.messages.map((message) => (
+                  {activeTask.messages && activeTask.messages.map((message) => (
                     <div
                       key={message.id}
                       className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}

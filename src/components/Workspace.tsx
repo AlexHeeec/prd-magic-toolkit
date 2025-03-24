@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import CenterPanel from "./CenterPanel";
 import LeftPanel from "./LeftPanel";
@@ -203,12 +202,8 @@ const Workspace: React.FC = () => {
     }, 2000);
   };
 
-  const handleAiAction = () => {
-    setIsAiModifying(true);
-    // Simulate AI modification delay
-    setTimeout(() => {
-      setIsAiModifying(false);
-    }, 1500);
+  const handleAiAction = (isModifying: boolean) => {
+    setIsAiModifying(isModifying);
   };
 
   const handleTaskSelect = (taskId: string) => {
@@ -218,34 +213,64 @@ const Workspace: React.FC = () => {
 
   const handleVersionSelect = (versionId: string) => {
     setActiveVersionId(versionId);
+    
+    // 添加版本到版本历史中
+    if (activeTask) {
+      // 检查该版本是否已存在
+      const existingVersions = taskVersionsMap[activeTask.id] || [];
+      const versionExists = existingVersions.some(v => v.id === versionId);
+      
+      if (!versionExists) {
+        // 如果版本不存在，添加它
+        const newVersions = [...existingVersions, {
+          id: versionId,
+          name: `Version ${existingVersions.length + 1}`,
+          timestamp: new Date(),
+          changes: `Updated version ${versionId}`
+        }];
+        
+        // 更新版本映射
+        const updatedVersionsMap = {...taskVersionsMap};
+        updatedVersionsMap[activeTask.id] = newVersions;
+        
+        // 更新版本列表状态
+        setVersions(newVersions);
+      } else {
+        // 如果版本已存在，只更新当前活动版本ID
+        setActiveVersionId(versionId);
+      }
+    }
   };
 
   const handleAddMessage = (message: Omit<Message, 'id'>) => {
     if (!activeTask) return;
     
-    // Create a copy of the tasks array
+    // 创建消息副本数组
     const updatedTasks = [...tasks];
     
-    // Find the index of the active task
+    // 找到活动任务的索引
     const taskIndex = updatedTasks.findIndex(task => task.id === activeTask.id);
     
     if (taskIndex === -1) return;
     
-    // Create a new message with a unique ID
+    // 创建带有唯一ID的新消息
     const newMessage = {
       ...message,
       id: `${activeTask.id}-${Date.now()}`
     };
     
-    // Add the message to the active task's messages
+    // 将消息添加到活动任务的消息列表
     updatedTasks[taskIndex] = {
       ...updatedTasks[taskIndex],
       messages: [...updatedTasks[taskIndex].messages, newMessage]
     };
     
-    // Update the tasks state and active task
+    // 更新任务状态和活动任务
     setTasks(updatedTasks);
     setActiveTask(updatedTasks[taskIndex]);
+    
+    console.log("Message added:", newMessage);
+    console.log("Updated active task messages:", updatedTasks[taskIndex].messages);
   };
 
   return (
