@@ -215,14 +215,14 @@ const Workspace: React.FC = () => {
   const handleVersionSelect = (versionId: string) => {
     setActiveVersionId(versionId);
     
-    // 添加版本到版本历史中
+    // Add version to version history
     if (activeTask) {
-      // 检查该版本是否已存在
+      // Check if version already exists
       const existingVersions = taskVersionsMap[activeTask.id] || [];
       const versionExists = existingVersions.some(v => v.id === versionId);
       
       if (!versionExists) {
-        // 如果版本不存在，添加它
+        // If version doesn't exist, add it
         const newVersions = [...existingVersions, {
           id: versionId,
           name: `Version ${existingVersions.length + 1}`,
@@ -230,14 +230,14 @@ const Workspace: React.FC = () => {
           changes: `Updated version ${versionId}`
         }];
         
-        // 更新版本映射
+        // Update version map
         const updatedVersionsMap = {...taskVersionsMap};
         updatedVersionsMap[activeTask.id] = newVersions;
         
-        // 更新版本列表状态
+        // Update versions state
         setVersions(newVersions);
       } else {
-        // 如果版本已存在，只更新当前活动版本ID
+        // If version exists, just update active version ID
         setActiveVersionId(versionId);
       }
     }
@@ -269,16 +269,21 @@ const Workspace: React.FC = () => {
     console.log("Message added:", newMessage);
     
     // Make a deep copy of the task to modify
-    updatedTasks[taskIndex] = {
+    const updatedTask = {
       ...updatedTasks[taskIndex],
       messages: [...updatedTasks[taskIndex].messages, newMessage]
     };
+
+    updatedTasks[taskIndex] = updatedTask;
     
-    // Update the tasks state and active task
+    // Debug logging to verify the message was added
+    console.log("Updated active task messages:", updatedTask.messages);
+    
+    // Update the tasks state
     setTasks(updatedTasks);
-    setActiveTask(updatedTasks[taskIndex]);
     
-    console.log("Updated active task messages:", updatedTasks[taskIndex].messages);
+    // Update the active task reference
+    setActiveTask(updatedTask);
   };
 
   return (

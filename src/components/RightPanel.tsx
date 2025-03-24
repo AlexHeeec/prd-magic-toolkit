@@ -82,30 +82,33 @@ const RightPanel: React.FC<RightPanelProps> = ({
   }, [isGenerating, activeTask, onAddMessage]);
 
   const handleSendMessage = () => {
-    if (newMessage.trim() === "" || !activeTask || !onAddMessage) return;
+    if (newMessage.trim() === "" || !activeTask || !onAddMessage) {
+      console.log("Cannot send message: empty message or missing task/callback");
+      return;
+    }
     
     console.log("Sending message:", newMessage);
     
-    // 创建用户消息对象并添加到消息列表
+    // Create user message object and add to message list
     const userMessage: Omit<Message, 'id'> = {
       content: newMessage,
       sender: "user",
       timestamp: new Date(),
     };
 
-    // 添加用户消息到消息列表
+    // Add user message to message list
     onAddMessage(userMessage);
     
-    // 清空输入框并设置正在输入状态
+    // Clear input and set typing state
     setNewMessage("");
     setIsTyping(true);
 
-    // 通知AI正在处理变更
+    // Notify AI is processing changes
     if (onAiModifying) {
       onAiModifying(true);
     }
 
-    // 模拟AI处理和响应
+    // Simulate AI processing and response
     setTimeout(() => {
       const aiResponse = getAIResponse(userMessage.content);
 
@@ -115,11 +118,11 @@ const RightPanel: React.FC<RightPanelProps> = ({
         timestamp: new Date(),
       };
 
-      // 添加AI响应到消息列表
+      // Add AI response to message list
       onAddMessage(aiMessage);
       setIsTyping(false);
 
-      // 如果消息建议进行了修改，则添加新版本
+      // If message suggests a modification, add new version
       if (userMessage.content.toLowerCase().match(/add|delete|remove|modify|update|change|priority/)) {
         const newVersionId = `${activeTask.id}-v${versions.length + 1}`;
         const newVersion: Version = {
@@ -129,7 +132,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
           changes: `Modified test cases based on: "${userMessage.content.substring(0, 40)}${userMessage.content.length > 40 ? '...' : ''}"`
         };
 
-        // 选择新版本
+        // Select new version
         if (onVersionSelect) {
           onVersionSelect(newVersionId);
         }
@@ -141,7 +144,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
         });
       }
 
-      // 通知AI已完成修改
+      // Notify AI has completed modifications
       if (onAiModifying) {
         onAiModifying(false);
       }
@@ -166,7 +169,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
           .panel-transition {
             display: flex;
             flex-direction: column;
-            min-height: 0; /* 修复Safari浏览器滚动问题 */
+            min-height: 0; /* Fix Safari scrolling issues */
           }
           .message-list {
             flex: 1;
@@ -194,12 +197,13 @@ const RightPanel: React.FC<RightPanelProps> = ({
           {activeTask ? (
             <>
               <ScrollArea className="message-list flex-1">
-                <div className="space-y-4">
+                <div className="space-y-4" data-testid="message-container">
                   {activeTask.messages && activeTask.messages.length > 0 ? (
-                    activeTask.messages.map((message) => (
+                    activeTask.messages.map((message, index) => (
                       <div
-                        key={message.id}
+                        key={message.id || `msg-${index}`}
                         className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                        data-testid={`message-${message.sender}-${index}`}
                       >
                         <div className={`flex max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                           <div className={`flex-shrink-0 ${message.sender === 'user' ? 'ml-2' : 'mr-2'}`}>
@@ -232,7 +236,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
                                   : 'text-muted-foreground'
                               }`}
                             >
-                              {formatTime(message.timestamp)}
+                              {formatTime(message.timestamp instanceof Date ? message.timestamp : new Date(message.timestamp))}
                             </div>
                           </div>
                         </div>
