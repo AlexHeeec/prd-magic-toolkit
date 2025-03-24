@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -187,10 +186,6 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
                   <CardFooter className="p-4 pt-0 flex justify-between">
                     <span className="text-xs text-muted-foreground">{task.caseCount} test cases</span>
                     <div className="flex items-center space-x-1">
-                      <Button variant="ghost" size="sm" className="h-7 px-2">
-                        <FileText className="h-3.5 w-3.5" />
-                        <span className="sr-only">View</span>
-                      </Button>
                       <Button 
                         variant="ghost" 
                         size="sm" 
