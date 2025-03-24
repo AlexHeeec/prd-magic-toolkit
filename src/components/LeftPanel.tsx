@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -42,6 +41,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState("input");
+  const [prdInputType, setPrdInputType] = useState("text"); // Default to text input
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -107,29 +107,29 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
               <div className="grid grid-cols-2 inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-500">
                 <button 
                   className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ${
-                    activeTab === "text" 
+                    prdInputType === "text" 
                       ? "bg-white text-gray-900 shadow-sm" 
                       : "text-gray-500 hover:text-gray-900"
                   }`}
-                  onClick={() => setActiveTab("text")}
+                  onClick={() => setPrdInputType("text")}
                 >
                   <Text className="h-3 w-3 mr-1" />
                   <span>Text</span>
                 </button>
                 <button 
                   className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ${
-                    activeTab === "file" 
+                    prdInputType === "file" 
                       ? "bg-white text-gray-900 shadow-sm" 
                       : "text-gray-500 hover:text-gray-900"
                   }`}
-                  onClick={() => setActiveTab("file")}
+                  onClick={() => setPrdInputType("file")}
                 >
                   <FileUp className="h-3 w-3 mr-1" />
                   <span>File</span>
                 </button>
               </div>
               
-              <div className={`mt-2 ${activeTab !== "text" && activeTab !== "input" ? "hidden" : ""}`}>
+              <div className={`mt-2 ${prdInputType !== "text" ? "hidden" : ""}`}>
                 <div className="space-y-2">
                   <Textarea 
                     placeholder="Paste your PRD content here..."
@@ -140,7 +140,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
                 </div>
               </div>
               
-              <div className={`mt-2 ${activeTab !== "file" ? "hidden" : ""}`}>
+              <div className={`mt-2 ${prdInputType !== "file" ? "hidden" : ""}`}>
                 <div className="space-y-2">
                   <div className="border-2 border-dashed rounded-md p-6 text-center">
                     <FileUp className="mx-auto h-8 w-8 text-muted-foreground" />
