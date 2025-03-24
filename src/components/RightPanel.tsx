@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,6 +51,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const [messageHistory, setMessageHistory] = useState<string[]>([]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -80,6 +82,9 @@ const RightPanel: React.FC<RightPanelProps> = ({
 
   const handleSendMessage = () => {
     if (newMessage.trim() === "" || !activeTask || !onAddMessage) return;
+
+    // Add message to history
+    setMessageHistory(prev => [...prev, newMessage]);
 
     const userMessage: Omit<Message, 'id'> = {
       content: newMessage,
@@ -187,21 +192,21 @@ const RightPanel: React.FC<RightPanelProps> = ({
         `}
       </style>
       <Tabs defaultValue="chat" className="w-full h-full flex flex-col">
-        <TabsList className="grid grid-cols-2 m-4 mb-0">
+        <TabsList className="grid grid-cols-2 mx-auto my-4 w-48">
           <TabsTrigger value="chat" className="flex items-center gap-1">
             <MessageCircle className="h-4 w-4" />
             <span>AI Chat</span>
           </TabsTrigger>
-          {/* <TabsTrigger value="versions" className="flex items-center gap-1">
+          <TabsTrigger value="history" className="flex items-center gap-1">
             <History className="h-4 w-4" />
-            <span>Versions</span>
-          </TabsTrigger> */}
+            <span>History</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="chat" className="flex-1 flex flex-col p-4 pt-0 overflow-hidden TabsContent">
           {activeTask ? (
             <>
-              <div className="message-list">
+              <ScrollArea className="message-list flex-1">
                 <div className="space-y-4">
                   {activeTask.messages.map((message) => (
                     <div
@@ -267,9 +272,9 @@ const RightPanel: React.FC<RightPanelProps> = ({
                   )}
                   <div ref={messagesEndRef} />
                 </div>
-              </div>
+              </ScrollArea>
 
-              <div className="input-area">
+              <div className="input-area mt-4">
                 <div className="relative">
                   <Textarea
                     placeholder="Ask AI to modify test cases..."
@@ -301,26 +306,21 @@ const RightPanel: React.FC<RightPanelProps> = ({
           )}
         </TabsContent>
 
-        {/* <TabsContent value="versions" className="flex-1 flex flex-col p-4 pt-0 overflow-hidden TabsContent">
-          <div className="message-list">
-            {activeTask ? (
-              <div className="space-y-3">
-                {versions.map((version) => (
-                  <Card
-                    key={version.id}
-                    className={`p-3 hover:bg-accent/10 transition-colors cursor-pointer ${version.id === activeVersionId ? 'border-primary/30 bg-primary/5' : ''}`}
-                    onClick={() => handleVersionClick(version.id)}
-                  >
-                    <div className="flex justify-between items-start">
+        <TabsContent value="history" className="flex-1 flex flex-col p-4 pt-0 overflow-hidden TabsContent">
+          <ScrollArea className="flex-1">
+            {messageHistory.length > 0 ? (
+              <div className="space-y-2">
+                <h3 className="font-medium text-sm mb-4">Your Message History</h3>
+                {messageHistory.map((message, index) => (
+                  <Card key={index} className="p-3 text-sm">
+                    <div className="flex gap-2 items-start">
+                      <Avatar className="h-6 w-6">
+                        <AvatarFallback className="bg-secondary/50 text-xs">
+                          <User className="h-3 w-3" />
+                        </AvatarFallback>
+                      </Avatar>
                       <div>
-                        <h3 className="text-sm font-medium">{version.name}</h3>
-                        <p className="text-xs text-muted-foreground mt-1">{formatDate(version.timestamp)} at {formatTime(version.timestamp)}</p>
-                        <p className="text-xs mt-2">{version.changes}</p>
-                      </div>
-                      <div className="flex space-x-1">
-                        {version.id === activeVersionId && (
-                          <Badge variant="outline" className="text-xs bg-primary/10 border-primary/20">Current</Badge>
-                        )}
+                        {message}
                       </div>
                     </div>
                   </Card>
@@ -328,14 +328,14 @@ const RightPanel: React.FC<RightPanelProps> = ({
               </div>
             ) : (
               <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                Select a task to view versions
+                No message history yet
               </div>
             )}
-          </div>
-        </TabsContent> */}
+          </ScrollArea>
+        </TabsContent>
       </Tabs>
     </div>
   );
 };
 
-export default RightPanel;    
+export default RightPanel;
