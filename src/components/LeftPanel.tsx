@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -71,37 +72,64 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   const hasContent = prdInput.length > 0 || selectedFile !== null;
 
   return (
-  //<div className="panel-transition w-full h-full p-4 flex flex-col bg-white rounded-xl border border-primary/20 overflow-hidden">
     <div className="panel-transition w-full h-full p-4 flex flex-col bg-white rounded-xl border border-primary/20 shadow-sm overflow-hidden">
       <h2 className="text-lg font-medium mb-4">Test Case Generation</h2>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-2 mb-4">
-          <TabsTrigger value="input" className="flex items-center gap-1">
+      <div className="w-full">
+        <div className="grid grid-cols-2 mb-4">
+          <button 
+            className={`flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-sm transition-colors ${
+              activeTab === "input" 
+                ? "bg-white text-gray-900 shadow-sm" 
+                : "text-gray-500 hover:text-gray-900"
+            }`}
+            onClick={() => setActiveTab("input")}
+          >
             <FileText className="h-4 w-4" />
             <span>PRD Input</span>
-          </TabsTrigger>
-          <TabsTrigger value="history" className="flex items-center gap-1">
+          </button>
+          <button 
+            className={`flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-sm transition-colors ${
+              activeTab === "history" 
+                ? "bg-white text-gray-900 shadow-sm" 
+                : "text-gray-500 hover:text-gray-900"
+            }`}
+            onClick={() => setActiveTab("history")}
+          >
             <History className="h-4 w-4" />
             <span>Tasks</span>
-          </TabsTrigger>
-        </TabsList>
+          </button>
+        </div>
         
-        <TabsContent value="input" className="mt-0 space-y-4">
+        <div className={`mt-0 space-y-4 ${activeTab !== "input" ? "hidden" : ""}`}>
           {/* Input content */}
           <div className="space-y-2">
-            <Tabs defaultValue="text">
-              <TabsList className="grid grid-cols-2">
-                <TabsTrigger value="text" className="flex items-center gap-1">
-                  <Text className="h-3 w-3" />
+            <div>
+              <div className="grid grid-cols-2 inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-500">
+                <button 
+                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ${
+                    activeTab === "text" 
+                      ? "bg-white text-gray-900 shadow-sm" 
+                      : "text-gray-500 hover:text-gray-900"
+                  }`}
+                  onClick={() => setActiveTab("text")}
+                >
+                  <Text className="h-3 w-3 mr-1" />
                   <span>Text</span>
-                </TabsTrigger>
-                <TabsTrigger value="file" className="flex items-center gap-1">
-                  <FileUp className="h-3 w-3" />
+                </button>
+                <button 
+                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ${
+                    activeTab === "file" 
+                      ? "bg-white text-gray-900 shadow-sm" 
+                      : "text-gray-500 hover:text-gray-900"
+                  }`}
+                  onClick={() => setActiveTab("file")}
+                >
+                  <FileUp className="h-3 w-3 mr-1" />
                   <span>File</span>
-                </TabsTrigger>
-              </TabsList>
+                </button>
+              </div>
               
-              <TabsContent value="text" className="mt-2">
+              <div className={`mt-2 ${activeTab !== "text" && activeTab !== "input" ? "hidden" : ""}`}>
                 <div className="space-y-2">
                   <Textarea 
                     placeholder="Paste your PRD content here..."
@@ -110,9 +138,9 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
                     onChange={(e) => setPrdInput(e.target.value)}
                   />
                 </div>
-              </TabsContent>
+              </div>
               
-              <TabsContent value="file" className="mt-2">
+              <div className={`mt-2 ${activeTab !== "file" ? "hidden" : ""}`}>
                 <div className="space-y-2">
                   <div className="border-2 border-dashed rounded-md p-6 text-center">
                     <FileUp className="mx-auto h-8 w-8 text-muted-foreground" />
@@ -141,8 +169,8 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
                     )}
                   </div>
                 </div>
-              </TabsContent>
-            </Tabs>
+              </div>
+            </div>
           </div>
           
           <Button
@@ -165,9 +193,9 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
               </>
             )}
           </Button>
-        </TabsContent>
+        </div>
         
-        <TabsContent value="history" className="mt-0">
+        <div className={`mt-0 ${activeTab !== "history" ? "hidden" : ""}`}>
           {/* History content with scrollable area */}
           <ScrollArea className="h-full max-h-[calc(100vh-200px)] overflow-y-auto pr-4">
             <div className="space-y-3">
@@ -202,8 +230,8 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
               ))}
             </div>
           </ScrollArea>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 };
