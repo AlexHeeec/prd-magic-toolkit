@@ -413,12 +413,12 @@ const CenterPanel: React.FC<CenterPanelProps> = ({
             <div className="flex-1 overflow-hidden">
               <ScrollArea className="h-[calc(100vh-280px)]" orientation="both">
                 <div className="pb-4">
-                  <Table className="min-w-[800px]">
+                  <Table className="min-w-[700px]">
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[400px]">Test Case</TableHead>
-                        <TableHead>Priority</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead className="w-[60%]">Test Case</TableHead>
+                        <TableHead className="w-[20%]">Priority</TableHead>
+                        <TableHead className="w-[20%] text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

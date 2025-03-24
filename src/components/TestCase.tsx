@@ -168,14 +168,6 @@ const TestCase: React.FC<TestCaseProps> = ({
               >
                 {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 text-primary hover:bg-primary/10"
-                onClick={handleEditClick}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-primary hover:bg-primary/10">
