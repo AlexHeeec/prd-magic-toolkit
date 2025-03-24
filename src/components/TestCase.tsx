@@ -23,6 +23,24 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
 export interface TestCaseProps {
@@ -33,6 +51,7 @@ export interface TestCaseProps {
   expectedResults: string[];
   scenario: string;
   priority: "high" | "medium" | "low";
+  onUpdate?: (id: string, updatedTestCase: Partial<TestCaseProps>) => void;
 }
 
 const TestCase: React.FC<TestCaseProps> = ({
@@ -43,17 +62,61 @@ const TestCase: React.FC<TestCaseProps> = ({
   expectedResults,
   scenario,
   priority,
+  onUpdate,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const { toast } = useToast();
+
+  // Edit state
+  const [editTitle, setEditTitle] = useState(title);
+  const [editPreconditions, setEditPreconditions] = useState(preconditions.join('\n'));
+  const [editSteps, setEditSteps] = useState(steps.join('\n'));
+  const [editExpectedResults, setEditExpectedResults] = useState(expectedResults.join('\n'));
+  const [editPriority, setEditPriority] = useState(priority);
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setShowDeleteDialog(true);
+  };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Reset form values to current values when opening the dialog
+    setEditTitle(title);
+    setEditPreconditions(preconditions.join('\n'));
+    setEditSteps(steps.join('\n'));
+    setEditExpectedResults(expectedResults.join('\n'));
+    setEditPriority(priority);
+    
+    setShowEditDialog(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (onUpdate) {
+      const updatedTestCase = {
+        title: editTitle,
+        preconditions: editPreconditions.split('\n').filter(line => line.trim() !== ''),
+        steps: editSteps.split('\n').filter(line => line.trim() !== ''),
+        expectedResults: editExpectedResults.split('\n').filter(line => line.trim() !== ''),
+        priority: editPriority as "high" | "medium" | "low",
+      };
+      
+      onUpdate(id, updatedTestCase);
+      
+      toast({
+        title: "Test case updated",
+        description: "The test case has been updated successfully.",
+      });
+    }
+    
+    setShowEditDialog(false);
   };
 
   const handleDelete = () => {
@@ -116,7 +179,7 @@ const TestCase: React.FC<TestCaseProps> = ({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem className="cursor-pointer" onClick={handleEditClick}>
                       <Edit className="h-4 w-4 mr-2" />
                       <span>Edit</span>
                     </DropdownMenuItem>
@@ -184,6 +247,78 @@ const TestCase: React.FC<TestCaseProps> = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Test Case</DialogTitle>
+            <DialogDescription>
+              Make changes to the test case details below.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="priority">Priority</Label>
+              <Select value={editPriority} onValueChange={setEditPriority}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="preconditions">Preconditions (one per line)</Label>
+              <Textarea
+                id="preconditions"
+                value={editPreconditions}
+                onChange={(e) => setEditPreconditions(e.target.value)}
+                rows={3}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="steps">Steps (one per line)</Label>
+              <Textarea
+                id="steps"
+                value={editSteps}
+                onChange={(e) => setEditSteps(e.target.value)}
+                rows={4}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="expected-results">Expected Results (one per line)</Label>
+              <Textarea
+                id="expected-results"
+                value={editExpectedResults}
+                onChange={(e) => setEditExpectedResults(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveEdit}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
